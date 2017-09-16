@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
-import org.xplus.sample.entity.system.User;
+import org.xplus.sample.entity.basic.User;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
