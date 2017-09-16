@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="edge" />
+<meta name="viewport" content="width=device-width, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0" />
+<title th:text="#{xplus.system.user}"></title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<link type="text/css" th:href="@{/css/icon.css}" rel="stylesheet" />
+<link type="text/css" th:href="@{/css/themes/color.css}" rel="stylesheet" />
+<link type="text/css" th:href="@{/css/themes/gray/easyui.css}" rel="stylesheet" />
+<script type="text/javascript" th:src="@{/js/jquery-1.8.0.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+<th:block th:switch="${#locale.language}">
+	<script th:case="'zh'" type="text/javascript" th:src="@{/js/locale/easyui-lang-zh_CN.js}"></script>
+	<script th:case="*" type="text/javascript" th:src="@{/js/locale/easyui-lang-en.js}"></script>
+</th:block>
+</head>
+<body class="easyui-layout" data-options="fit:true">
+	<div data-options="region:'north',title:'',split:true" style="height: 100px;">
+		<form id="queryForm" method="post">
+			<input name="username" class="easyui-textbox" type="text" th:label="#{xplus.system.user.label.username}" />
+			<input name="name" class="easyui-textbox" type="text" th:label="#{label.name}" />
+			<a href="javascript:;" onclick="query()" class="easyui-linkbutton" data-options="iconCls:'icon-search'"
+				th:text="#{button.query}">查询</a>
+		</form>
+	</div>
+	<div data-options="region:'center',title:'center title'" style="padding: 5px; background: #eee;">
+		<!-- 工具栏 -->
+		<div id="tools" style="height: auto">
+			<div>
+				<a href="javascript:;" onclick="add()" class="easyui-linkbutton" data-options="iconCls:'icon-add'"
+					th:text="#{button.add}">新增</a>
+				<a href="javascript:;" onclick="edit()" class="easyui-linkbutton" data-options="iconCls:'icon-edit'"
+					th:text="#{button.edit}">修改</a>
+				<a href="javascript:;" onclick="del()" class="easyui-linkbutton" data-options="iconCls:'icon-remove'"
+					th:text="#{button.delete}">删除</a>
+			</div>
+		</div>
+		<!-- 列表 -->
+		<table id="userGrid" data-options="toolbar:'#tools',fit:true">
+			<thead>
+				<tr>
+					<th data-options="field:'id',width:0,hidden:true" th:text="#{label.id}">ID</th>
+					<th data-options="field:'no',width:50,align:'center',sortable:true" th:text="#{label.empNo}">编号</th>
+					<th data-options="field:'username',width:150,align:'center'," th:text="#{xplus.system.user.label.username}">账号</th>
+					<th data-options="field:'password',width:150,align:'center'," th:text="#{xplus.system.user.label.password}">密码</th>
+					<th data-options="field:'name',width:100,align:'center'" th:text="#{label.name}">姓名</th>
+					<th data-options="field:'enName',width:100,align:'center'" th:text="#{label.enName}">英文名</th>
+					<th data-options="field:'sexName',width:100,align:'center'" th:text="#{xplus.system.user.label.sex}">性别</th>
+					<th data-options="field:'birthday',width:100,align:'center'">出生日期</th>
+					<th data-options="field:'userTypeName',width:100,align:'center'" th:text="#{xplus.system.user.label.userType}">用户类型</th>
+					<th data-options="field:'userStatusName',width:200,align:'center'" th:text="#{xplus.system.user.label.userStatus}">用户状态</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+
+	<!-- 编辑用户信息 -->
+	<div id="userDialog" class="easyui-dialog" style="width: 420px; padding: 20px 30px; top: 10%"
+		data-options="closed:true,modal:true,buttons:'#userDialogFormToolbar'">
+		<form id="userDialogForm" method="post">
+			<input name="id" type="hidden" />
+			<div style="text-align: center;">
+				<table style="border-width: 0px;">
+					<tr>
+						<td style="text-align: right;">编号：</td>
+						<td><input id="no" name="no" class="easyui-textbox" style="width: 180px;" data-options="required:true," /></td>
+					</tr>
+					<tr>
+						<td style="text-align: right;">账号：</td>
+						<td><input name="username" class="easyui-textbox" style="width: 180px;"
+								data-options="required:true,validType:['length[0, 16]']" /></td>
+					</tr>
+					<tr>
+						<td style="text-align: right;">密码：</td>
+						<td><input name="password" class="easyui-textbox" style="width: 180px;" data-options="required:true" /></td>
+					</tr>
+					<tr>
+						<td style="text-align: right;">姓名：</td>
+						<td><input name="name" class="easyui-textbox" style="width: 180px;"
+								data-options="required:true,validType:['length[0, 6]']" /></td>
+					</tr>
+					<tr>
+						<td style="text-align: right;">英文名：</td>
+						<td><input name="enName" class="easyui-textbox" style="width: 180px;"
+								data-options="required:true,validType:['length[0, 6]']" /></td>
+					</tr>
+					<tr>
+						<td style="text-align: right;">出生日期：</td>
+						<td><input name="birthday" class="easyui-datebox" style="width: 180px;" data-options="required:true" /></td>
+					</tr>
+					<tr>
+						<td style="text-align: right;">性别：</td>
+						<td><select id="sex" name="sex" class="easyui-combobox" style="width: 180px;"
+							data-options="width:200,required:true">
+								<option th:each="sex,sexStat : ${sexList}" th:value="${sex.id}" th:text="${sex.name}"></option>
+						</select></td>
+					</tr>
+					<tr>
+						<td style="text-align: right;">类别：</td>
+						<td><select id="userType" name="userType" class="easyui-combobox" style="width: 180px;"
+							data-options="required:true">
+								<option th:each="userType,userTypeStat : ${userTypeList}" th:value="${userType.id}" th:text="${userType.name}"></option>
+						</select></td>
+					</tr>
+					<tr>
+						<td style="text-align: right;">状态：</td>
+						<td><select id="userStatus" name="userStatus" class="easyui-combobox" style="width: 180px;"
+							data-options="required:true">
+								<option th:each="userStatus,userStatusStat : ${userStatusList}" th:value="${userStatus.id}"
+									th:text="${userStatus.name}"></option>
+						</select></td>
+					</tr>
+
+				</table>
+			</div>
+		</form>
+		<div id="userDialogFormToolbar">
+			<a href="javascript:;" onclick="save()" class="easyui-linkbutton" data-options="iconCls:'icon-ok'">保存</a>
+			<a href="javascript:;" onclick="closeDialog()" class="easyui-linkbutton" data-options="iconCls:'icon-cancel'">取消</a>
+		</div>
+	</div>
+
+</body>
+<!--  -->
+<script type="text/javascript" th:inline="javascript">
+	/*<![CDATA[*/
+
+	$(function() {
+		//......初始化方法
+		var editRow = undefined; //定义全局变量：当前编辑的行
+		$('#userGrid').datagrid({
+			method : 'get',
+			url : '/system/userPages',
+			rownumbers : true,
+			pagination : true,
+			showFooter : true,
+			singleSelect : true,
+			idField : 'id',
+			sortName : 'id,no',
+			sortOrder : 'asc,desc',
+			queryParams : {},
+			onLoadSuccess : function(data) {
+				if (data.rows.length > 0) {
+					$(this).datagrid('selectRow', 0);
+				}
+			},
+			columns : [ [ {
+				field : 'id',
+				width : 0,
+				hidden : true,
+			}, {
+				field : 'no',
+				width : 150,
+				halign : 'center',
+				align : 'left',
+				title : /*[[#{label.no}]]*/'用户编号',
+			}, {
+				field : 'username',
+				width : 150,
+				halign : 'center',
+				align : 'left',
+				title : /*[[#{xplus.system.user.label.username}]]*/'账号',
+			}, {
+				field : 'password',
+				width : 150,
+				halign : 'center',
+				align : 'left',
+				title : /*[[#{xplus.system.user.label.password}]]*/'密码',
+			}, {
+				field : 'name',
+				width : 150,
+				halign : 'center',
+				align : 'left',
+				title : /*[[#{label.name}]]*/'姓名',
+				editor : {
+					type : 'textbox',
+				}
+			}, {
+				field : 'enName',
+				width : 150,
+				halign : 'center',
+				align : 'left',
+				title : /*[[#{label.enName}]]*/'英文名',
+				editor : {
+					type : 'textbox',
+				}
+			}, {
+				field : 'sexName',
+				width : 50,
+				halign : 'center',
+				align : 'left',
+				title : /*[[#{xplus.system.user.label.sex}]]*/'性别',
+			}, {
+				field : 'birthday',
+				width : 150,
+				halign : 'center',
+				align : 'left',
+				title : /*[[#{xplus.system.user.label.birthday}]]*/'出生日期',
+			}, {
+				field : 'userTypeName',
+				width : 100,
+				halign : 'center',
+				align : 'left',
+				title : /*[[#{xplus.system.user.label.userType}]]*/'状态',
+			}, {
+				field : 'userStatusName',
+				width : 50,
+				halign : 'center',
+				align : 'left',
+				title : /*[[#{xplus.system.user.label.userStatus}]]*/'类型',
+			} ] ],
+			onDblClickRow : function(rowIndex, rowData) {
+				//双击开启编辑行
+				if (editRow != undefined) {
+					$(this).datagrid("endEdit", editRow);
+				}
+				if (editRow == undefined) {
+					$(this).datagrid("beginEdit", rowIndex);
+					editRow = rowIndex;
+				}
+			},
+			onClickRow : function(rowIndex, rowData) {
+			},
+
+		});
+	});
+	//查询
+	function query() {
+		var values = $('#queryForm').serializeArray();
+		var data = {};
+		for ( var item in values) {
+			data[values[item].name] = values[item].value;
+		}
+		//......
+		var queryParams = $("#userGrid").datagrid("options").queryParams;
+		queryParams.params = JSON.stringify(data);
+		$("#userGrid").datagrid("options").queryParams = queryParams;
+		$("#userGrid").datagrid("reload");
+	}
+	//
+	function add() {
+		$('#userDialog').dialog('open').dialog('setTitle', '新建');
+		//initFormComponent();
+		$('#userDialogForm').form('clear');
+		//.....
+		$('#no').textbox('textbox').attr('disabled', false);
+	}
+	//
+	function edit() {
+		var row = $('#userGrid').datagrid('getSelected');
+		if (row) {
+			$('#userDialog').dialog('open').dialog('setTitle', '编辑');
+			//initFormComponent();
+			$('#userDialogForm').form('load', row);
+			//......
+			$('#no').textbox('textbox').attr('disabled', true);
+		} else {
+			$.messager.alert(/* [[#{dialog.info}]] */'提示',
+			/* [[#{dialog.info.selectedOne}]] */'请选择一行');
+		}
+	}
+	//
+	function initFormComponent() {
+		//
+		$('#userType').combobox({
+			method : 'get',
+			url : '/system/userTypeLookup',
+			valueField : 'id',
+			textField : 'name',
+		});
+		//
+		$('#sex').combobox({
+			method : 'get',
+			url : '/system/sexLookup',
+			valueField : 'id',
+			textField : 'name',
+		});
+	}
+	//
+	function del() {
+		var row = $('#userGrid').datagrid('getSelected');
+		if (row) {
+			$.messager.confirm('提示', '您确定删除该项数据吗？', function(r) {
+				if (r) {
+					$.ajax({
+						type : 'delete',
+						url : '/system/user/' + row.id,
+						dataType : 'json',
+						success : function(result) {
+							if (result.success) {
+								$.messager.show({
+									title : '我的消息',
+									msg : result.msg,
+									timeout : 3000,
+								});
+								$("#userGrid").datagrid("load");
+							} else {
+								$.messager.alert(/*[[#{dialog.error}]]*/'提示!',
+										data.msg);
+							}
+						},
+						error : function() {
+							$.messager.alert('错误', '请求数据失败.');
+							return;
+						}
+					});
+				}
+			});
+		} else {
+			$.messager.alert('提示', '请选择删除的数据');
+			return;
+		}
+	}
+	//
+	function batchDel() {
+		var rows = $('#userGrid').datagrid('getSelections');
+		if (rows) {
+			$.messager.confirm('提示', '您确定删除该项数据吗？', function(r) {
+				if (r) {
+					var ids = new Array();
+					debugger;
+					$.each(rows, function(i, item) {
+						ids.push(item.id);
+					});
+					$.ajax({
+						type : 'delete',
+						url : '/system/user',
+						dataType : "json",
+						async : true,
+						data : {
+							ids : ids
+						},
+						success : function(result) {
+							if (result.success) {
+								$.messager.show({
+									title : '我的消息',
+									msg : result.msg,
+									timeout : 3000,
+								});
+								$("#userGrid").datagrid("reload");
+							} else {
+								$.messager.alert(/*[[#{dialog.error}]]*/'提示!',
+										data.msg);
+							}
+						},
+						error : function() {
+							$.messager.alert('错误', '请求数据失败.');
+							return;
+						}
+					});
+				}
+			});
+		} else {
+			$.messager.alert('提示', '请选择删除的数据');
+			return;
+		}
+	}
+	//
+	function save() {
+		$('#userDialogForm').form('submit', {
+			ajax : true,
+			iframe : false,
+			url : '/system/user',
+			onSubmit : function() {
+				return $(this).form('validate');
+			},
+			queryParams : {},
+			success : function(result) {
+				var result = eval('(' + result + ')');
+				if (result.success) {
+					$('#userDialog').dialog('close'); // close the dialog
+					$.messager.show({
+						title : '提示',
+						msg : result.msg,
+						timeout : 2000,
+						showType : 'slide'
+					});
+					$('#userGrid').datagrid('reload'); // reload the user data
+				} else {
+					$.messager.show({
+						title : '错误',
+						msg : result.msg
+					});
+				}
+			}
+		});
+	}
+	//
+	function closeDialog() {
+		$('#userDialog').dialog('close');
+	}
+	//......
+
+	/*]]>*/
+</script>
+</html>

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta th:replace="header::systemCss" />
+</head>
+<body>
+	<div class="easyui-layout" data-options="fit:true">
+		<!-- 查询表单 -->
+		<div data-options="region:'north',border:false,collapsible:true" style="height: 35px;">
+			<form id="queryForm" method="post">
+				<input id="no" name="no" class="easyui-textbox" th:label="#{label.no}" data-options="width:200" />
+				<input id="name" name="name" class="easyui-textbox" th:label="#{label.name}" data-options="width:200" />
+				<a href="javascript:;" onclick="query()" id="btnQuery" class="easyui-linkbutton" data-options="iconCls:'icon-search'" th:text="#{button.search}">查询 </a>
+			</form>
+		</div>
+		<!-- 数据列表 -->
+		<div data-options="region:'center',border:false,collapsible:true">
+			<!-- 定义工具条  面板-->
+			<div id="gridToolbar">
+				<a href="javascript:;" onclick="add()" id="btnAdd" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true" th:text="#{button.add}">新增</a>
+				<a href="javascript:;" onclick="edit()" id="btnEdit" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true" th:text="#{button.edit}">修改</a>
+				<a href="javascript:;" onclick="del()" id="btnDel" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" th:text="#{button.delete}">删除</a>
+				<a href="javascript:;" onclick="settingProperty()" id="btnAddProperty" class="easyui-linkbutton" data-options="iconCls:'icon-set',plain:true"
+					th:text="#{nerp.productData.materialMainType.button.setProp}">设置属性</a>
+			</div>
+			<table id="grid">
+				<thead>
+					<tr>
+						<th data-options="field:'id',width:0,hidden:true">Id</th>
+						<th data-options="field:'no',width:100,align:'center',sortable:true" th:text="#{nerp.productData.materialMainType.label.no}">大类编号</th>
+						<th data-options="field:'name',width:200,align:'left'" th:text="#{nerp.productData.materialMainType.label.name}">中文名称</th>
+						<th data-options="field:'enName',width:200,align:'left'" th:text="#{nerp.productData.materialMainType.label.enName}">英文名称</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+		<!-- ==================== 表单对话框 ====================-->
+		<div>
+			<div id="dialogToolbar">
+				<a href="javascript:;" onclick="save()" id="btnSave" class="easyui-linkbutton" data-options="iconCls:'icon-ok',plain:true" th:text="#{button.save}">保存</a>
+				<a href="javascript:;" onclick="closeDialog()" id="btnCancel" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',plain:true" th:text="#{button.cancel}">取消</a>
+			</div>
+			<div id="dialog" class="easyui-dialog" style="top: 10%; width: 420px; height: 220px; padding: 10px 20px" data-options="closed:true,buttons:'#dialogToolbar',modal:true">
+				<form id="dialogForm" method="POST" data-options="iframe:false">
+					<input id="id" name="id" type="hidden" />
+					<table class="kv-table">
+						<tbody>
+							<tr>
+								<td class="kv-label"><span style="color: #f30;">*</span><label for="no" th:text="#{nerp.productData.materialMainType.label.no}">编号</label></td>
+								<td class="kv-content"><input id="dialogForm_textbox_no" name="no" class="easyui-textbox" data-options="width:200,required:true" /></td>
+							</tr>
+							<tr>
+								<td class="kv-label"><span style="color: #f30;">*</span><label for="name" th:text="#{nerp.productData.materialMainType.label.name}">中文名称</label></td>
+								<td class="kv-content"><input name="name" class="easyui-textbox" data-options="width:200,required:true" /></td>
+							</tr>
+							<tr>
+								<td class="kv-label"><span style="color: #f30;">*</span><label for="enName" th:text="#{nerp.productData.materialMainType.label.enName}">英文名称</label></td>
+								<td class="kv-content"><input name="enName" class="easyui-textbox" data-options="width:200,required:true" /></td>
+							</tr>
+						</tbody>
+					</table>
+				</form>
+			</div>
+		</div>
+		<!-- ==================== 属性设置对话框 ====================-->
+		<div>
+			<div id="propertyDialogToolbar">
+				<a href="javascript:;" onclick="closePropertyDialog()" id="btnCancel" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',plain:true" th:text="#{button.close}">关闭</a>
+			</div>
+			<div id="propertyDialog" class="easyui-dialog" style="top: 5%; width: 880px; height: 580px; padding: 10px 20px"
+				data-options="closed:true,buttons:'#propertyDialogToolbar',modal:true">
+				<div class="easyui-layout" data-options="fit:true">
+					<div data-options="region:'west',border:false,collapsible:false,split:true" style="width: 420px;">
+						<div id="propertyGridToolbar">
+							<a href="javascript:;" onclick="addProperty()" id="btnAddProperty" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true" th:text="#{button.add}">新增</a>
+							<a href="javascript:;" onclick="delProperty()" id="btnDelProperty" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" th:text="#{button.delete}">删除</a>
+						</div>
+						<table id="propertyGrid" class="easyui-datagrid" data-options="fit:true,toolbar:'#propertyGridToolbar'">
+							<thead>
+								<tr>
+									<th data-options="field:'materialProperty',width:0,hidden:true">id</th>
+									<th data-options="field:'materialPropertyNo',width:75,align:'center',sortable:true" th:text="#{label.no}">编号</th>
+									<th data-options="field:'materialPropertyName',width:150,align:'left'" th:text="#{label.name}">名称</th>
+									<th data-options="field:'materialPropertyEnName',width:150,align:'left'" th:text="#{label.enName}">英文名称</th>
+								</tr>
+							</thead>
+						</table>
+					</div>
+					<div data-options="region:'center',border:false,collapsible:true">
+						<div id="specGridToolbar">
+							<a href="javascript:;" onclick="saveSpec()" id="btnSavePropertySpec" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" th:text="#{button.save}">保存</a>
+						</div>
+						<table id="specGrid" class="easyui-datagrid" data-options="fit:true,toolbar:'#specGridToolbar'">
+							<thead>
+								<tr>
+									<th data-options="field:'ck',checkbox:true"></th>
+									<th data-options="field:'id',width:0,hidden:true">id</th>
+									<th data-options="field:'name',width:150,align:'left'" th:text="#{nerp.productData.materialProperty.label.specName}">中文属性值</th>
+									<th data-options="field:'enName',width:150,align:'left'" th:text="#{nerp.productData.materialProperty.label.specEnName}">英文属性值</th>
+								</tr>
+							</thead>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- 属性查询对话框 -->
+		<div>
+			<div id="propertySearchDialogToolbar">
+				<a href="javascript:;" onclick="saveProperty()" id="btnAddPropertyToLine" class="easyui-linkbutton" data-options="iconCls:'icon-ok',plain:true" th:text="#{button.add}">添加</a>
+				<a href="javascript:;" onclick="closePropertySearchDialog()" id="btnPropertySearchDialogCancel" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',plain:true"
+					th:text="#{button.close}">关闭</a>
+			</div>
+			<div id="propertySearchDialog" class="easyui-dialog" style="top: 5%; width: 580px; height: 380px; padding: 10px 20px"
+				data-options="closed:true,buttons:'#propertySearchDialogToolbar',modal:true">
+				<div class="easyui-layout" data-options="fit:true">
+					<div data-options="region:'north',border:false,collapsible:true" style="height: 42px;">
+						<form id="propertySearchGridForm" method="post" data-options="iframe:false">
+							<table>
+								<tr>
+									<td><label for="no" th:text="#{label.no}">编号</label></td>
+									<td><input name="no" class="easyui-textbox" data-options="width:200" /></td>
+									<td><label for="name" th:text="#{label.name}">中文名称</label></td>
+									<td><input name="name" class="easyui-textbox" data-options="width:200" /></td>
+									<td><a href="javascript:;" onclick="queryProperty()" id="btnQueryProperty" class="easyui-linkbutton" data-options="iconCls:'icon-search'" th:text="#{button.search}">查询
+										</a></td>
+								</tr>
+							</table>
+						</form>
+					</div>
+					<div data-options="region:'center',border:false,collapsible:true">
+						<table id="propertySearchGrid" class="easyui-datagrid" data-options="fit:true">
+							<thead>
+								<tr>
+									<th data-options="field:'ck',checkbox:true"></th>
+									<th data-options="field:'id',width:0,hidden:true">id</th>
+									<th data-options="field:'no',width:100,align:'center'" th:text="#{label.no}">编号</th>
+									<th data-options="field:'name',width:150,align:'left'" th:text="#{label.name}">名称</th>
+									<th data-options="field:'enName',width:150,align:'left'" th:text="#{label.enName}">英文名称</th>
+								</tr>
+							</thead>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<div th:replace="footer::systemJs"></div>
+	<script type="text/javascript" th:inline="javascript">
+		/*<![CDATA[*/
+
+		$(function() {
+
+			//初始化DataGrid数据
+			$('#grid').datagrid({
+				fit : true,
+				method : 'get',
+				url : '/productData/materialMainTypePages',
+				pagination : true,
+				rownumbers : true,
+				showFooter : true,
+				singleSelect : false,
+				idField : 'id',
+				sortName : 'no',
+				sortOrder : 'asc',
+				toolbar : '#gridToolbar',
+				onBeforeLoad : function(param) {
+					$('#btnQuery').linkbutton('disable');
+				},
+				onLoadSuccess : function(data) {
+					$('#btnQuery').linkbutton('enable');
+					//......
+					if (data.total > 0) {
+						$(this).datagrid('selectRow', 0);
+					}
+				},
+				onLoadError : function() {
+					$('#btnQuery').linkbutton('enable');
+				}
+			});
+
+		});
+		//
+		function query() {
+			var values = $('#queryForm').serializeArray();
+			var data = {};
+			for ( var item in values) {
+				data[values[item].name] = values[item].value;
+			}
+			//......
+			var queryParams = $("#grid").datagrid("options").queryParams;
+			queryParams.params = JSON.stringify(data);
+			$("#grid").datagrid("options").queryParams = queryParams;
+			$("#grid").datagrid("load");
+		}
+		//
+		function add() {
+			$('#dialog').dialog('open').dialog('setTitle', /*[[#{button.add}]]*/'新增');
+			$('#dialogForm').form('clear');
+			//......
+			$('#dialogForm_textbox_no').textbox('textbox').attr('disabled', false);
+		}
+		//
+		function edit() {
+			var row = $('#grid').datagrid('getSelected');
+			if (row) {
+				$('#dialog').dialog('open').dialog('setTitle', /*[[#{button.edit}]]*/'编辑');
+				$('#dialogForm').form('load', row);
+				//......
+				$('#dialogForm_textbox_no').textbox('textbox').attr('disabled', true);
+			} else {
+				$.messager.alert(/* [[#{dialog.info}]] */'提示',
+				/* [[#{dialog.info.selectedOne}]] */'请选择一行');
+			}
+		}
+		function save() {
+			//
+			$('#dialogForm').form('submit', {
+				url : '/productData/materialMainType',
+				onSubmit : function() {
+					return $(this).form('validate');
+				},
+				success : function(data) {
+					var result = eval('(' + data + ')');
+					if (result.success) {
+						$('#dialog').dialog('close'); // close the dialog
+						$.messager.show({
+							title : 'Success',
+							msg : $.messager.defaults.success,
+							timeout : 2000
+						});
+						$('#grid').datagrid('reload'); // reload the user data
+					} else {
+						if (result.msg == 'duplicate') {
+							$.messager.error('Error', '编号重复', function() {
+							});
+						} else {
+							$.messager.show({
+								title : 'Error',
+								msg : $.messager.defaults.error,
+								timeout : 2000
+							});
+						}
+					}
+				}
+			});
+		}
+		//
+		function del() {
+			//单条记录删除，中、小类有关联
+			var rows = $('#grid').datagrid('getSelections');
+			if (rows.length > 0) {
+				$.messager.confirm(/*[[#{dialog.confirm}]]*/'确认!',
+				/*[[#{dialog.confirm.delete}]]*/'确认删除吗?', function(r) {
+					if (r) {
+						var ids = new Array();
+						$.each(rows, function(i, row) {
+							ids.push(row.id);
+						});
+						$.ajax({
+							url : '/productData/materialMainType/' + ids + '',
+							type : 'delete',
+							dataType : 'json',
+							async : true,
+							success : function(data) {
+								if (data.success) {
+									$('#grid').datagrid('reload'); // reload the user data
+								} else {
+									$.messager.alert(/*[[#{dialog.error}]]*/'提示!', data.msg);
+								}
+							},
+						});
+					}
+				});
+			} else {
+				$.messager.alert(/*[[#{dialog.info}]]*/'提示!',
+				/*[[#{dialog.info.selectOneToDelete}]]*/'请选择一条数据删除。');
+			}
+		}
+
+		//
+		function closeDialog() {
+			$('#dialog').dialog('close');
+		}
+
+		//新增大分类属性设置
+		function settingProperty() {
+			var title = /*[[#{nerp.productData.materialMainType.dialog.propertySetting}]]*/'设置属性';
+			$('#propertyDialog').dialog('open').dialog('setTitle', title);
+			//......
+			var row = $('#grid').datagrid('getSelected');
+			$('#propertyGrid').datagrid({
+				fit : true,
+				method : 'GET',
+				url : '/productData/materialMainPropertyListPages',
+				rownumbers : true,
+				pagination : true,
+				showFooter : true,
+				idField : 'id',
+				sortName : 'materialPropertyNo',
+				sortOrder : 'asc',
+				queryParams : {
+					materialMainType : row.id
+				},
+				onLoadSuccess : function(data) {
+					if (data.total > 0) {
+						$(this).datagrid('selectRow', 0);
+					} else {
+						$('#specGrid').datagrid("loadData", {
+							total : 0,
+							rows : []
+						});
+					}
+				},
+				onSelect : function(index, row) {
+					linkQueryPropertyAndSpec(row.id, row.materialProperty);
+				}
+			});
+		}
+		//打开查询属性对话框
+		function addProperty() {
+			var title = /*[[#{nerp.productData.materialMainType.dialog.propertySearch}]]*/'查询属性';
+			$('#propertySearchDialog').dialog('open').dialog('setTitle', title);
+			//......
+			$('#propertySearchGrid').datagrid('loadData', {
+				total : 0,
+				rows : []
+			});
+			$('#propertySearchGridForm').form('clear');
+		}
+		//删除属性行
+		function delProperty() {
+			var row = $('#propertyGrid').datagrid('getSelected');
+			if (row) {
+				$('#btnDelProperty').linkbutton('disable');
+				$.messager.confirm(/*[[#{dialog.confirm}]]*/'确认!',
+				/*[[#{dialog.confirm.delete}]]*/'确认删除吗?', function(r) {
+					if (r) {
+						$.ajax({
+							url : '/productData/materialMainPropertyList/' + row.id,
+							type : 'delete',
+							dataType : 'json',
+							async : true,
+							success : function(data) {
+								if (data.success) {
+									$('#propertyGrid').datagrid('load');
+									$('#btnDelProperty').linkbutton('enable');
+								} else {
+									$.messager.alert(/*[[#{dialog.error}]]*/'提示!', data.msg);
+								}
+							},
+						});
+					} else {
+						$('#btnDelProperty').linkbutton('enable');
+					}
+				});
+			} else {
+				$.messager.alert(/*[[#{dialog.info}]]*/'提示!',
+				/*[[#{dialog.info.selectOneToDelete}]]*/'请选择一条数据删除。');
+			}
+		}
+		//查询属性
+		function queryProperty() {
+			var values = $('#propertySearchGridForm').serializeArray();
+			var data = {};
+			for ( var item in values) {
+				data[values[item].name] = values[item].value;
+			}
+			//......获取已选择的属性
+			var existsRows = $("#propertyGrid").datagrid('getRows');
+			var ids = new Array();
+			$.each(existsRows, function(i, row) {
+				ids.push(row.materialProperty);
+			});
+			//......
+			var queryParams = $('#propertySearchGrid').datagrid('options').queryParams;
+			queryParams.params = JSON.stringify(data);
+			queryParams.ids = JSON.stringify(ids);
+			debugger;
+			$('#propertySearchGrid').datagrid({
+				fit : true,
+				method : 'GET',
+				url : '/productData/materialPropertyPagesFilterByIds',
+				pagination : true,
+				rownumbers : true,
+				singleSelect : false,
+				checkOnSelect : true,
+				showFooter : true,
+				idField : 'id',
+				sortName : 'id',
+				sortOrder : 'desc',
+				queryParams : queryParams,
+				onLoadSuccess : function(data) {
+					$('#propertySearchGrid').datagrid('clearChecked');
+				},
+			});
+		}
+		//添加查询结果到设置行
+		function saveProperty() {
+			var row = $('#grid').datagrid('getSelected');
+			var rows = $('#propertySearchGrid').datagrid('getChecked');
+			if (row) {
+				debugger;
+				if (rows.length > 0) {
+					$.ajax({
+						url : '/productData/materialMainPropertyListBatchAdd',
+						type : 'post',
+						dataType : 'json',
+						data : 'params={"tableId":"' + row.id + '","tableLines":' + JSON.stringify(rows) + '}',
+						async : true,/*异步选项*/
+						success : function(data) {
+							if (data.success) {
+								$.messager.show({
+									title : 'Success',
+									msg : $.messager.defaults.success,
+									timeout : 2000
+								});
+								$('#propertyGrid').datagrid('reload');
+								$('#propertyGrid').datagrid({
+									onLoadSuccess : function(data) {
+										queryProperty();
+									}
+								});
+
+							} else {
+								$.messager.alert(/*[[#{dialog.error}]]*/'提示!', data.msg);
+							}
+						},
+					});
+				} else {
+					$.messager.alert(/*[[#{dialog.info}]]*/'提示',
+					/*[[#{dialog.info.selectedToSave}]]*/'请选择一行保存');
+				}
+			}
+		}
+		//关闭查询属性对话框
+		function closePropertySearchDialog() {
+			$('#propertySearchDialog').dialog('close');
+		}
+
+		//物料属性、规格连接查询
+		function linkQueryPropertyAndSpec(id, specId) {
+			$('#specGrid').datagrid({
+				fit : true,
+				method : 'GET',
+				url : '/productData/materialSpecPages',
+				rownumbers : true,
+				pagination : true,
+				singleSelect : false,
+				checkOnSelect : true,
+				showFooter : true,
+				idField : 'id',
+				sortName : 'id',
+				sortOrder : 'desc',
+				queryParams : {
+					tableId : specId
+				},
+				onLoadSuccess : function(data) {
+					if (data) {
+						$.ajax({
+							type : 'get',
+							url : '/productData/materialMainPropertyListSpecs/' + id,
+							async : true,/*异步选项*/
+							dataType : 'json',
+							success : function(data) {
+								if (data.length > 0) {
+									for (let i = 0, len = data.length; i <= len; i++) {
+										var idx = $('#specGrid').datagrid('getRowIndex', data[i].id);
+										$('#specGrid').datagrid('checkRow', idx);
+									}
+								}
+							},
+						});
+					}
+				},
+			});
+		}
+
+		//保存勾选的规格(属性值)
+		function saveSpec() {
+			debugger;
+			var row = $('#propertyGrid').datagrid('getSelected');
+			if (row) {
+				var rows = $('#specGrid').datagrid('getChecked');
+				if (rows.length > 0) {
+					var ids = new Array();
+					$.each(rows, function(i, item) {
+						ids.push(item.id);
+					});
+					$.ajax({
+						/* url : '/productData/materialMainPropertySpecListBatchAdd', */
+						url : '/productData/materialMainPropertyListSaveSpec',
+						type : 'post',
+						dataType : 'json',
+						async : true,/*异步选项*/
+						data : 'params={"tableId":"' + row.id + '","lineIds":' + JSON.stringify(ids) + '}',
+						success : function(data) {
+							if (data.success) {
+								$.messager.show({
+									title : 'Success',
+									msg : $.messager.defaults.success,
+									timeout : 2000
+								});
+								$('#specGrid').datagrid('reload');
+							} else {
+								$.messager.alert(/*[[#{dialog.error}]]*/'提示!', data.msg);
+							}
+						},
+					});
+				} else {
+					$.messager.alert(/*[[#{dialog.info}]]*/'提示',
+					/*[[#{dialog.info.selectedToSave}]]*/'请选择要保存的数据');
+				}
+			}
+		}
+
+		//关闭属性设置窗口
+		function closePropertyDialog() {
+			$('#propertyDialog').dialog('close');
+		}
+
+		/*]]>*/
+	</script>
+</body>
+</html>
