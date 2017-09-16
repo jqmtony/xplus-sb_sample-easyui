@@ -1,4 +1,4 @@
-# SpringBoot EasyUI Sample Project
+# Spring-Boot + EasyUI Sample
 
 ## 项目信息
 
