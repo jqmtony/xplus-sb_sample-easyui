@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta th:replace="header::systemCss" />
+</head>
+<body>
+	<div class="easyui-layout" data-options="fit:true">
+		<!-- 查询表单 -->
+		<div data-options="region:'north',border:false,collapsible:true" style="height: 35px;">
+			<form id="queryForm" method="post">
+				<input name="no" class="easyui-textbox" th:label="#{label.no}" data-options="width:200" />
+				<input name="name" class="easyui-textbox" th:label="#{label.name}" data-options="width:200" />
+				<a href="javascript:;" onclick="query()" id="btnQuery" class="easyui-linkbutton" data-options="iconCls:'icon-search'" th:text="#{button.search}">查询 </a>
+			</form>
+		</div>
+		<!-- 数据列表 -->
+		<div data-options="region:'center',border:false,collapsible:true">
+			<!-- 定义工具条  面板-->
+			<div id="dataGridToolbar">
+				<a href="javascript:;" onclick="add()" class="easyui-linkbutton" data-options="iconCls:'icon-add'" th:text="#{button.add}">新增</a>
+				<a href="javascript:;" onclick="edit()" class="easyui-linkbutton" data-options="iconCls:'icon-edit'" th:text="#{button.edit}">修改</a>
+				<a href="javascript:;" onclick="del()" class="easyui-linkbutton" data-options="iconCls:'icon-remove'" th:text="#{button.delete}">删除</a>
+			</div>
+			<table id="grid">
+				<thead>
+					<tr>
+						<th data-options="field:'id',width:0,hidden:true">ID</th>
+						<th data-options="field:'no',width:100,align:'center',sortable:true" th:text="#{label.no}">编号</th>
+						<th data-options="field:'name',width:200,align:'center'" th:text="#{label.name}">名称</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+		<div>
+			<!-- 用户新增页 -->
+			<div id="dialog" class="easyui-dialog" style="top: 10%; width: 380px; height: 230px; padding: 10px 20px" data-options="closed:true,buttons:'#dialogToolbar',modal:true">
+				<form id="dialogForm" method="post" data-options="iframe:false">
+					<input id="id" name="id" type="hidden" />
+					<table class="kv-table">
+						<tbody>
+							<tr>
+								<td class="kv-label"><span style="color: #f30;">*</span><label for="no" th:text="#{label.no}">编号</label></td>
+								<td class="kv-content"><input id="dialogForm_textbox_no" name="no" class="easyui-textbox" data-options="width:200,required:true" /></td>
+							</tr>
+							<tr>
+								<td class="kv-label"><span style="color: #f30;">*</span><label for="name" th:text="#{label.name}">中文名称</label></td>
+								<td class="kv-content"><input name="name" class="easyui-textbox" data-options="width:200,required:true" /></td>
+							</tr>
+							<!-- <tr>
+								<td class="kv-label"><label for="toolingType" th:text="#{label.type}">类型</label>:</td>
+								<td class="kv-content"><select id="dialogForm_combobox_toolingType" name="toolingType" class="easyui-combobox" style="width: 200px;" data-options="required:true">
+										<option th:each="toolingType : ${toolingTypes}" th:value="${toolingType.id}" th:text="${toolingType.name}"></option>
+								</select></td>
+							</tr> -->
+						</tbody>
+					</table>
+				</form>
+			</div>
+			<!-- 新增按钮面板 -->
+			<div id="dialogToolbar">
+				<a href="javascript:;" onclick="save()" class="easyui-linkbutton" data-options="iconCls:'icon-save'" th:text="#{button.save}">保存</a>
+				<a href="javascript:;" onclick="dialogClose()" class="easyui-linkbutton" data-options="iconCls:'icon-cancel'" th:text="#{button.cancel}">取消</a>
+			</div>
+		</div>
+	</div>
+	<div th:replace="footer::systemJs"></div>
+	<script type="text/javascript" th:inline="javascript">
+		/*<![CDATA[*/
+
+		$(function() {
+
+			//初始化DataGrid数据
+			$('#grid').datagrid({
+				fit : true,
+				method : 'GET',
+				url : '/productData/toolingPages',
+				pagination : true,
+				rownumbers : true,
+				showFooter : true,
+				idField : 'id',
+				sortName : 'no',
+				sortOrder : 'desc',
+				toolbar : '#dataGridToolbar',
+				onBeforeLoad : function(param) {
+					$('#btnQuery').linkbutton('disable');
+				},
+				onLoadSuccess : function(data) {
+					$('#btnQuery').linkbutton('enable');
+					//......
+					if (data.rows.length > 0) {
+						$(this).datagrid('selectRow', 0);
+					}
+				},
+				onLoadError : function() {
+					$('#btnQuery').linkbutton('enable');
+				}
+			});
+		});
+
+		//查询
+		function query() {
+			var values = $('#queryForm').serializeArray();
+			var data = {};
+			for ( var item in values) {
+				data[values[item].name] = values[item].value;
+			}
+			//......
+			var queryParams = $("#grid").datagrid("options").queryParams;
+			queryParams.params = JSON.stringify(data);
+			$("#grid").datagrid("options").queryParams = queryParams;
+			$("#grid").datagrid("load");
+		}
+
+		//新增Tooling
+		function add() {
+			$('#dialog').dialog('open').dialog('setTitle',
+			/*[[#{button.add}]]*/'新增');
+			$('#dialogForm').form('clear');
+			//......
+			$('#dialogForm_textbox_no').textbox('textbox').attr('disabled', false);
+			$("#dialogForm_combobox_toolingType").combobox('setValue', '0');
+		}
+
+		//编辑Tooling
+		function edit() {
+			var row = $('#grid').datagrid('getSelected');
+			debugger;
+			if (row) {
+				$('#dialog').dialog('open').dialog('setTitle',/*[[#{button.edit}]]*/'编辑');
+				$('#dialogForm').form('load', row);
+				//......
+				$('#dialogForm_textbox_no').textbox('textbox').attr('disabled', true);
+			} else {
+				$.messager.alert(/* [[#{dialog.info}]] */'提示',
+				/* [[#{dialog.info.selectedOne}]] */'请选择一行');
+			}
+		}
+
+		//保存Tooling
+		function save() {
+			debugger;
+			//
+			$('#dialogForm').form('submit', {
+				url : '/productData/tooling',
+				onSubmit : function() {
+					return $(this).form('validate');
+				},
+				success : function(data) {
+					var result = eval('(' + data + ')');
+					if (result.success) {
+						$('#dialog').dialog('close'); // close the dialog
+						$.messager.show({
+							title : 'Success',
+							msg : $.messager.defaults.success,
+							timeout : 2000
+						});
+						$('#grid').datagrid('reload'); // reload the user data
+					} else {
+						if (result.msg == 'duplicate') {
+							$.messager.error('Error', '编号重复', function() {
+							});
+						} else {
+							$.messager.show({
+								title : 'Error',
+								msg : $.messager.defaults.error,
+								timeout : 2000
+							});
+						}
+					}
+				}
+			});
+		}
+
+		//删除Tooling
+		function del() {
+			//单条记录删除，中、小类有关联
+			var row = $('#grid').datagrid('getSelected');
+			if (row) {
+				$.messager.confirm(/*[[#{dialog.confirm}]]*/'确认!',
+				/*[[#{dialog.confirm.delete}]]*/'确认删除吗?', function(r) {
+					if (r) {
+						$.ajax({
+							url : '/productData/tooling/' + row.id + '',
+							type : 'delete',
+							dataType : 'json',
+							async : true,
+							success : function(data) {
+								if (data.success) {
+									$('#grid').datagrid('reload'); // reload the user data
+								} else {
+									$.messager.alert(/*[[#{dialog.error}]]*/'提示!', data.msg);
+								}
+							},
+						});
+					}
+				});
+			} else {
+				$.messager.alert(/*[[#{dialog.info}]]*/'提示!',
+				/*[[#{dialog.info.selectOneToDelete}]]*/'请选择一条数据删除。');
+			}
+		}
+
+		//关闭窗口
+		function dialogClose() {
+			$('#dialog').dialog('close');
+		}
+
+		/*]]>*/
+	</script>
+</body>
+</html>

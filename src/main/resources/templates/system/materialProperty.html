@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta th:replace="header::systemCss" />
+</head>
+<body>
+	<div class="easyui-layout" data-options="fit:true">
+		<!-- 查询表单 -->
+		<div data-options="region:'north',border:false,collapsible:true" style="height: 35px;">
+			<form id="gridSearchForm" method="post">
+				<input name="no" class="easyui-textbox" th:label="#{label.no}" data-options="width:200" />
+				<input name="name" class="easyui-textbox" th:label="#{label.name}" data-options="width:200" />
+				<a href="javascript:;" onclick="query()" id="btnSearch" class="easyui-linkbutton" data-options="iconCls:'icon-search'" th:text="#{button.search}">查询 </a>
+			</form>
+		</div>
+		<!-- 数据列表 -->
+		<div data-options="region:'center',border:false,collapsible:true">
+			<div class="easyui-layout" data-options="fit:true">
+				<div data-options="region:'north',border:false,collapsible:true" style="height: 320px;">
+					<div id="gridToolbar">
+						<a href="javascript:;" onclick="add()" id="btnAdd" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true" th:text="#{button.add}">新增</a>
+						<a href="javascript:;" onclick="edit()" id="btnEdit" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true" th:text="#{button.edit}">修改</a>
+						<a href="javascript:;" onclick="del()" id="btnDel" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" th:text="#{button.delete}">删除</a>
+						<a href="javascript:;" onclick="updateActived()" id="btnDeactived" class="easyui-linkbutton" data-options="iconCls:'icon-exclamation',plain:true"
+							th:text="#{button.deactived}">停用</a>
+					</div>
+					<table id="grid">
+						<thead>
+							<tr>
+								<th data-options="field:'id',width:0,hidden:true">id</th>
+								<th data-options="field:'no',width:100,align:'center'" th:text="#{label.no}">编号</th>
+								<th data-options="field:'name',width:200,align:'left'" th:text="#{label.name}">名称</th>
+								<th data-options="field:'enName',width:200,align:'left'" th:text="#{label.enName}">英文名称</th>
+								<th data-options="field:'displayFlag',width:150,align:'center',formatter:checkboxFormatter" th:text="#{nerp.productData.materialProperty.label.showFlag}">是否显示在物料名称</th>
+								<th data-options="field:'actived',width:50,align:'center',formatter:checkboxFormatter" th:text="#{nerp.productData.materialProperty.label.actived}">启用</th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+				<div data-options="region:'center',border:false,collapsible:true,title:'物料规格'">
+					<div id="lineGridToolbar">
+						<a href="javascript:;" onclick="addLine()" id="btnAddLine" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true" th:text="#{button.add}">新增</a>
+						<a href="javascript:;" onclick="delLine()" id="btnDelLine" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" th:text="#{button.delete}">删除</a>
+						<a href="javascript:;" onclick="updateLineActived()" id="btnDeactivedLine" class="easyui-linkbutton" data-options="iconCls:'icon-exclamation',plain:true"
+							th:text="#{button.deactived}">停用</a>
+					</div>
+					<table id="lineGrid">
+						<thead>
+							<tr>
+								<th data-options="field:'id',width:0,hidden:true">id</th>
+								<th data-options="field:'name',width:200,align:'left'" th:text="#{nerp.productData.materialProperty.label.specName}">中文属性值</th>
+								<th data-options="field:'enName',width:200,align:'left'" th:text="#{nerp.productData.materialProperty.label.specEnName}">英文属性值</th>
+								<th data-options="field:'actived',width:50,align:'center',formatter:checkboxFormatter" th:text="#{nerp.productData.materialProperty.label.actived}">启用</th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+		<!-- ==================== 物料属性表单对话框 ====================-->
+		<div>
+			<div id="dialogToolbar">
+				<a href="javascript:;" onclick="save()" id="btnSave" class="easyui-linkbutton" data-options="iconCls:'icon-ok'" th:text="#{button.save}">保存</a>
+				<a href="javascript:;" onclick="closeDialog()" id="btnCloseDialog" class="easyui-linkbutton" data-options="iconCls:'icon-cancel'" th:text="#{button.cancel}">取消</a>
+			</div>
+			<div id="dialog" class="easyui-dialog" style="top: 10%; width: 480px; height: 280px; padding: 10px 20px" data-options="closed:true,buttons:'#dialogToolbar',modal:true">
+				<form id="dialogForm" method="POST" data-options="iframe:false">
+					<input name="id" type="hidden" />
+					<table class="kv-table">
+						<tbody>
+							<tr>
+								<td class="kv-label"><label for="no" th:text="#{label.no}">编号</label></td>
+								<td class="kv-content"><input id="dialogForm_textbox_no" name="no" class="easyui-textbox" style="width: 200px;" data-options="required:true" /></td>
+							</tr>
+							<tr>
+								<td class="kv-label"><label for="name" th:text="#{label.name}">中文名称</label></td>
+								<td class="kv-content"><input name="name" class="easyui-textbox" style="width: 200px;" data-options="required:true" /></td>
+							</tr>
+							<tr>
+								<td class="kv-label"><label for="enName" th:text="#{label.enName}">英文名称</label></td>
+								<td class="kv-content"><input name="enName" class="easyui-textbox" style="width: 200px;" /></td>
+							</tr>
+							<tr>
+								<td class="kv-label"><label for="enName" th:text="#{nerp.productData.materialProperty.label.showFlag}">是否显示在物料名称</label></td>
+								<td class="kv-content"><input id="dialogForm_checkbox_displayFlag" name="displayFlag" type="checkbox" /></td>
+							</tr>
+						</tbody>
+					</table>
+				</form>
+			</div>
+		</div>
+		<!-- ==================== 物料属性表单对话框 ====================-->
+		<div>
+			<div id="lineDialogToolbar">
+				<a href="javascript:;" onclick="saveLine()" id="btnSaveLine" class="easyui-linkbutton" data-options="iconCls:'icon-ok'" th:text="#{button.save}">保存</a>
+				<a href="javascript:;" onclick="closeLineDialog()" id="btnCloseLineDialog" class="easyui-linkbutton" data-options="iconCls:'icon-cancel'" th:text="#{button.cancel}">取消</a>
+			</div>
+			<div id="lineDialog" class="easyui-dialog" style="top: 5%; width: 420px; height: 220px; padding: 10px 20px" data-options="closed:true,buttons:'#lineDialogToolbar',modal:true">
+				<form id="lineDialogForm" method="POST" data-options="iframe:false">
+					<input name="id" type="hidden" />
+					<input id="lineDialogForm_txt_materialProperty" name="materialProperty" type="hidden" />
+					<table class="kv-table">
+						<tbody>
+							<tr>
+								<td class="kv-label"><label for="name" th:text="#{nerp.productData.materialProperty.label.specName}">属性值</label></td>
+								<td class="kv-content"><input name="name" class="easyui-textbox" style="width: 200px;" data-options="required:true" /></td>
+							</tr>
+							<tr>
+								<td class="kv-label"><label for="enName" th:text="#{nerp.productData.materialProperty.label.specEnName}">英文属性值</label></td>
+								<td class="kv-content"><input name="enName" class="easyui-textbox" style="width: 200px;" /></td>
+							</tr>
+						</tbody>
+					</table>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div th:replace="footer::systemJs"></div>
+	<script type="text/javascript" th:inline="javascript">
+		/*<![CDATA[*/
+
+		$(function() {
+			//初始化grid
+			$('#grid').datagrid({
+				fit : true,
+				method : 'GET',
+				url : '/productData/materialPropertyPages',
+				pagination : true,
+				rownumbers : true,
+				idField : 'id',
+				sortName : 'no',
+				sortOrder : 'desc',
+				toolbar : '#gridToolbar',
+				singleSelect : false,
+				onBeforeLoad : function(param) {
+					$('#btnSearch').linkbutton('disable');
+				},
+				onLoadSuccess : function(data) {
+					$('#btnSearch').linkbutton('enable');
+					if (data.rows.length > 0) {
+						$(this).datagrid('selectRow', 0);
+					}
+				},
+				onSelect : function(index, row) {
+					queryLine(row.id);
+				},
+			});
+
+		});
+
+		/*查询明细*/
+		function queryLine(tableId) {
+			$('#lineGrid').datagrid({
+				fit : true,
+				method : 'get',
+				url : '/productData/materialSpecPages',
+				rownumbers : true,
+				pagination : true,
+				showFooter : true,
+				sortName : 'id',
+				sortOrder : 'asc',
+				toolbar : '#lineGridToolbar',
+				queryParams : {
+					tableId : tableId
+				},
+				onLoadSuccess : function(data) {
+					if (data.rows.length > 0) {
+						$(this).datagrid('selectRow', 0);
+					}
+				},
+			});
+		}
+
+		//
+		function query() {
+			var values = $('#gridSearchForm').serializeArray();
+			var data = {};
+			for ( var item in values) {
+				data[values[item].name] = values[item].value;
+			}
+			//......
+			var queryParams = $("#grid").datagrid("options").queryParams;
+			queryParams.params = JSON.stringify(data);
+			$("#grid").datagrid("options").queryParams = queryParams;
+			$("#grid").datagrid("load");
+		}
+
+		//新增
+		function add() {
+			var title = /*[[#{nerp.productData.materialProperty.dialog.addTitle}]]*/'新增物料属性维护页';
+			$('#dialog').dialog('open').dialog('setTitle', title);
+			$('#dialogForm').form('clear');
+			//......
+			$('#dialogForm_textbox_no').textbox('textbox').attr('disabled', false);
+			$('#dialogForm_checkbox_displayFlag').prop('checked', true);
+		}
+		//编辑
+		function edit() {
+			var title = /*[[#{nerp.productData.materialProperty.dialog.editTitle}]]*/'修改物料属性维护页';
+			var row = $('#grid').datagrid('getSelected');
+			debugger;
+			if (row) {
+				$('#dialog').dialog('open').dialog('setTitle', title);
+				$('#dialogForm').form('load', row);
+				//......
+				$('#dialogForm_textbox_no').textbox('textbox').attr('disabled', true);
+				$('#dialogForm_checkbox_displayFlag').prop('checked', row.displayFlag);
+			} else {
+				$.messager.alert(/* [[#{dialog.info}]] */'提示!',
+				/* [[#{dialog.info.selectedOne}]] */'请选择一行.');
+			}
+		}
+		//
+		function save() {
+			//
+			$('#dialogForm').form('submit', {
+				url : '/productData/materialProperty',
+				onSubmit : function() {
+					return $(this).form('validate');
+				},
+				success : function(data) {
+					var result = eval('(' + data + ')');
+					if (result.success) {
+						$('#dialog').dialog('close');
+						$('#grid').datagrid('reload');
+						$.messager.show({
+							title : /*[[#{label.success}]]*/'成功!',
+							msg : $.messager.defaults.success,
+							timeout : 2000
+						});
+					} else {
+						$.messager.alert(/*[[#{dialog.error}]]*/'错误!', $.messager.defaults.error, 'error');
+					}
+				}
+			});
+		}
+		//删除
+		function del() {
+			//单条记录删除，中、小类有关联
+			var rows = $('#grid').datagrid('getChecked');
+			if (rows.length > 0) {
+				$.messager.confirm(/*[[#{dialog.confirm}]]*/'确认',
+				/*[[#{dialog.confirm.delete}]]*/'确定删除吗？', function(r) {
+					if (r) {
+						var ids = new Array();
+						$.each(rows, function(i, row) {
+							ids.push(row.id);
+						});
+						$.ajax({
+							url : '/productData/materialProperty/' + ids + '',
+							type : 'delete',
+							dataType : 'json',
+							async : true,
+							success : function(data) {
+								if (data.success) {
+									$('#grid').datagrid('reload'); // reload the user data
+								} else {
+									$.messager.alert(/*[[#{dialog.error}]]*/'错误!',
+									/*[[#{dialog.error.deleteFailed}]]*/'删除失败！', 'error');
+								}
+							},
+							dataType : 'json'
+						});
+					}
+				});
+			} else {
+				$.messager.alert(/*[[#{dialog.info}]]*/'提示!',
+				/*[[#{dialog.info.selectOneToDelete}]]*/'请选择一行删除.');
+			}
+		}
+		//
+		function updateActived() {
+			var row = $('#grid').datagrid('getSelected');
+			debugger;
+			if (row) {
+				if (row.actived) {
+					$.messager.confirm(/*[[#{dialog.confirm}]]*/'确认!',
+					/*[[#{dialog.confirm.modify}]]*/'确认修改吗?', function(r) {
+						if (r) {
+							$.ajax({
+								url : '/productData/materialPropertyUpdateActived',
+								type : 'PUT',
+								dataType : 'json',
+								async : true,
+								data : row,
+								success : function(data) {
+									debugger;
+									if (data.success) {
+										$('#grid').datagrid('reload'); // reload the user data
+									} else {
+										$.messager.alert(/*[[#{dialog.error}]]*/'提示!', data.msg);
+									}
+								},
+								dataType : 'json'
+							});
+						}
+					});
+				} else {
+					$.messager.alert(/*[[#{dialog.info}]]*/'提示!', '数据已停用。');
+				}
+			} else {
+				$.messager.alert(/*[[#{dialog.info}]]*/'提示!',
+				/*[[#{dialog.info.selectOneToEdit}]]*/'请选择一条数据删除。');
+			}
+		}
+
+		//关闭编辑窗口
+		function closeDialog() {
+			$('#dialog').dialog('close');
+		}
+		//新增行
+		function addLine() {
+			var title = /*[[#{nerp.productData.materialProperty.dialog.addTitle}]]*/'新增物料属性维护页';
+			$('#lineDialog').dialog('open').dialog('setTitle', title);
+			$('#lineDialogForm').form('clear');
+			//......
+			var row = $('#grid').datagrid('getSelected');
+			if (row) {
+				$('#lineDialog').dialog('open').dialog('setTitle',/*[[#{button.add}]]*/'添加');
+				$('#lineDialogForm').form('clear');
+				$('#lineDialogForm_txt_materialProperty').val(row.id);
+			}
+		}
+		//删除行
+		function delLine() {
+			var row = $('#lineGrid').datagrid('getSelected');
+			if (row) {
+				$.messager.confirm(/*[[#{dialog.confirm}]]*/'确认',
+				/*[[#{dialog.confirm.delete}]]*/'确定删除吗？', function(r) {
+					if (r) {
+						$.ajax({
+							url : '/productData/materialSpec/' + row.id,
+							type : 'delete',
+							dataType : 'json',
+							async : true,
+							success : function(data) {
+								if (data.success) {
+									$('#lineGrid').datagrid('reload'); // reload the user data
+								} else {
+									$.messager.alert(/*[[#{dialog.error}]]*/'错误!',
+									/*[[#{dialog.error.deleteFailed}]]*/'删除失败！', 'error');
+								}
+							},
+							dataType : 'json'
+						});
+					}
+				});
+			} else {
+				$.messager.alert(/*[[#{dialog.info}]]*/'提示!',
+				/*[[#{dialog.info.selectOneToDelete}]]*/'请选择一行删除.');
+			}
+		}
+		//
+		function saveLine() {
+			$('#lineDialogForm').form('submit', {
+				url : '/productData/materialSpec',
+				onSubmit : function() {
+					if ($(this).form('validate')) {
+						$('#btnSaveLine').linkbutton('disable');
+						return true;
+					}
+					return false;
+				},
+				success : function(data) {
+					$('#btnSaveLine').linkbutton('enable');
+					var result = eval('(' + data + ')');
+					if (result.success) {
+						closeLineDialog();
+						$('#lineGrid').datagrid('reload');
+					} else {
+						if (result.msg == 'duplicate')
+							$.messager.warning(/*[[|#{nerp.customs.customContract.label.productItem} #{dialog.warning.exist}|]]*/'已存在！');
+						else
+							$.messager.error(/*[[#{dialog.error.failed}]]*/'出现错误');
+					}
+				}
+			});
+
+		}
+		//停用行数据
+		function updateLineActived() {
+			var row = $('#lineGrid').datagrid('getSelected');
+			if (row) {
+				if (row.actived) {
+					$.messager.confirm(/*[[#{dialog.confirm}]]*/'确认!',
+					/*[[#{dialog.confirm.modify}]]*/'确认修改吗?', function(r) {
+						if (r) {
+							$.ajax({
+								url : '/productData/materialSpecUpdateActived',
+								type : 'PUT',
+								dataType : 'json',
+								async : true,
+								data : row,
+								success : function(data) {
+									debugger;
+									if (data.success) {
+										$('#lineGrid').datagrid('reload'); // reload the user data
+									} else {
+										$.messager.alert(/*[[#{dialog.error}]]*/'提示!', data.msg);
+									}
+								},
+								dataType : 'json'
+							});
+						}
+					});
+				} else {
+					$.messager.alert(/*[[#{dialog.info}]]*/'提示!', '数据已停用。');
+				}
+
+			} else {
+				$.messager.alert(/*[[#{dialog.info}]]*/'提示!',
+				/*[[#{dialog.info.selectOneToEdit}]]*/'请选择一条数据删除。');
+			}
+		}
+		//关闭行编辑窗口
+		function closeLineDialog() {
+			$('#lineDialog').dialog('close');
+		}
+
+		/*]]>*/
+	</script>
+</body>
+</html>
