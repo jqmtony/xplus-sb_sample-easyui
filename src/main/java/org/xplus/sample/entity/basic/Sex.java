@@ -2,7 +2,11 @@ package org.xplus.sample.entity.basic;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
@@ -19,19 +23,23 @@ public class Sex implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	// .....
-	private long id;
+	private Integer id;
 	private String no;
 	private String name;
 	private String enName;
 
-	public long getId() {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "ID", unique = true, nullable = false)
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
+	@Column(name = "NO", length = 32)
 	public String getNo() {
 		return no;
 	}
@@ -40,6 +48,7 @@ public class Sex implements Serializable {
 		this.no = no;
 	}
 
+	@Column(name = "NAME", length = 32)
 	public String getName() {
 		return name;
 	}
@@ -48,6 +57,7 @@ public class Sex implements Serializable {
 		this.name = name;
 	}
 
+	@Column(name = "EN_NAME", length = 32)
 	public String getEnName() {
 		return enName;
 	}
@@ -61,7 +71,7 @@ public class Sex implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Sex(long id, String no, String name, String enName) {
+	public Sex(Integer id, String no, String name, String enName) {
 		super();
 		this.id = id;
 		this.no = no;

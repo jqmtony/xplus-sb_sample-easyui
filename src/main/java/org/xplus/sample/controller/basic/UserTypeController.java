@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.xplus.sample.service.basic.UserTypeService;
 
 @Controller
-@RequestMapping("/system")
+@RequestMapping("/basic")
 public class UserTypeController {
 
 	@Autowired

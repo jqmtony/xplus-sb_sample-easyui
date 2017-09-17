@@ -6,6 +6,6 @@ import org.xplus.sample.entity.basic.User;
 import org.xplus.sample.repositoryImpl.basic.UserRepositoryCustom;
 
 @Repository
-public interface UserRepository extends BaseRepository<User, String>, UserRepositoryCustom {
+public interface UserRepository extends BaseRepository<User, String> {
 
 }

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.xplus.sample.service.basic.SexService;
 
 @Controller
-@RequestMapping("/system")
+@RequestMapping("/basic")
 public class SexController {
 	
 	@Autowired

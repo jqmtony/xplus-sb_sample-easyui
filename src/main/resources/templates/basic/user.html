@@ -133,7 +133,7 @@
 		var editRow = undefined; //定义全局变量：当前编辑的行
 		$('#userGrid').datagrid({
 			method : 'get',
-			url : '/system/userPages',
+			url : '/basic/userPages',
 			rownumbers : true,
 			pagination : true,
 			showFooter : true,
@@ -267,14 +267,14 @@
 		//
 		$('#userType').combobox({
 			method : 'get',
-			url : '/system/userTypeLookup',
+			url : '/basic/userTypeLookup',
 			valueField : 'id',
 			textField : 'name',
 		});
 		//
 		$('#sex').combobox({
 			method : 'get',
-			url : '/system/sexLookup',
+			url : '/basic/sexLookup',
 			valueField : 'id',
 			textField : 'name',
 		});
@@ -287,7 +287,7 @@
 				if (r) {
 					$.ajax({
 						type : 'delete',
-						url : '/system/user/' + row.id,
+						url : '/basic/user/' + row.id,
 						dataType : 'json',
 						success : function(result) {
 							if (result.success) {
@@ -327,7 +327,7 @@
 					});
 					$.ajax({
 						type : 'delete',
-						url : '/system/user',
+						url : '/basic/user',
 						dataType : "json",
 						async : true,
 						data : {
@@ -363,7 +363,7 @@
 		$('#userDialogForm').form('submit', {
 			ajax : true,
 			iframe : false,
-			url : '/system/user',
+			url : '/basic/user',
 			onSubmit : function() {
 				return $(this).form('validate');
 			},

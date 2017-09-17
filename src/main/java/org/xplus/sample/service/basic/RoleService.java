@@ -1,5 +1,8 @@
 package org.xplus.sample.service.basic;
 
+import org.springframework.data.domain.Page;
+import org.xplus.sample.entity.basic.Role;
+
 /**
  * 
  * @author jqmtony
@@ -7,4 +10,6 @@ package org.xplus.sample.service.basic;
  *
  */
 public interface RoleService {
+	
+	Page<Role> findAll();
 }

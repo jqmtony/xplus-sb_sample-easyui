@@ -4,14 +4,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
+import org.xplus.sample.commons.pojo.PagedResult;
 import org.xplus.sample.entity.basic.User;
-import org.xplus.sample.vo.system.UserVO;
+import org.xplus.sample.vo.basic.UserVO;
 
 public interface UserService {
 
-	List<User> findAll();
-
-	Page<User> findAll(int pageNo, int pageSize, List<String> sort, List<String> order);
+	PagedResult<UserVO> findAll(int pageNo, int pageSize, List<String> sort, List<String> order);
+	
+	//Page<User> findAll(int pageNo, int pageSize, List<String> sort, List<String> order);
 
 	Page<User> findAll(int pageNo, int pageSize, List<String> sort, List<String> order, Map<String, Object> params);
 

@@ -22,13 +22,14 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.xplus.sample.commons.pojo.PagedResult;
 import org.xplus.sample.entity.basic.User;
 import org.xplus.sample.repository.basic.SexRepository;
 import org.xplus.sample.repository.basic.UserRepository;
 import org.xplus.sample.repository.basic.UserStatusRepository;
 import org.xplus.sample.repository.basic.UserTypeRepository;
 import org.xplus.sample.service.basic.UserService;
-import org.xplus.sample.vo.system.UserVO;
+import org.xplus.sample.vo.basic.UserVO;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -48,28 +49,21 @@ public class UserServiceImpl implements UserService {
 	UserStatusRepository userStatusRepository;
 
 	@Override
-	public Page<User> findAll(int pageNo, int pageSize, List<String> sort, List<String> order) {
-		Page<User> page = null;
+	public PagedResult<UserVO> findAll(int pageNo, int pageSize, List<String> sort, List<String> order) {
 		Sort sorts = sortGenerate(sort, order);
+		List<UserVO> vos = new ArrayList<UserVO>();
+		List<User> users = null;
 		Pageable pageable = new PageRequest(pageNo, pageSize, sorts);
-		// ......
-		page = userRepository.findAll(new Specification<User>() {
-			@Override
-			public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-				List<Predicate> predicates = new ArrayList<>();
-				/*
-				 * if (clauseMap.containsKey("vendTableNo")) { String str =
-				 * clauseMap.get("vendTableNo").toString().trim(); if
-				 * (str.indexOf("*") >= 0) {
-				 * predicates.add(cb.like(root.join("vendTable").get("no"),
-				 * str.replace("*", "%"))); } else {
-				 * predicates.add(cb.equal(root.join("vendTable").get("no"),
-				 * str)); } }
-				 */
-				return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+		Page page = userRepository.findAll(pageable);
+		if (page.getTotalElements() > 0) {
+			users = page.getContent();
+			for (User user : users) {
+				UserVO vo = new UserVO(user);
+				vos.add(vo);
 			}
-		}, pageable);
-		return page;
+		}
+		// ......
+		return new PagedResult<>(page.getTotalElements(), vos);
 	}
 
 	@Override
@@ -125,7 +119,7 @@ public class UserServiceImpl implements UserService {
 		try {
 			String voId = vo.getId();
 			User entity = null;
-			if ("".equals(voId)) {
+			if (StringUtils.isBlank(voId)) {
 				entity = new User();
 				entity.setNo(vo.getNo());
 				entity.setUsername(vo.getUsername());
@@ -137,12 +131,10 @@ public class UserServiceImpl implements UserService {
 			entity.setName(vo.getName());
 			entity.setEnName(vo.getEnName());
 			entity.setPassword(vo.getPassword());
-			entity.setSex(StringUtils.isBlank(vo.getSex()) ? null : sexRepository.getOne(vo.getSex()));
+			entity.setSex(sexRepository.findOne(vo.getSex()));
 			entity.setBirthday(vo.getBirthday());
-			entity.setUserType(
-					StringUtils.isBlank(vo.getUserType()) ? null : userTypeRepository.getOne(vo.getUserType()));
-			entity.setUserStatus(
-					StringUtils.isBlank(vo.getUserStatus()) ? null : userStatusRepository.getOne(vo.getUserStatus()));
+			entity.setUserType(userTypeRepository.findOne(vo.getUserType()));
+			entity.setUserStatus(userStatusRepository.findOne(vo.getUserStatus()));
 			// ......
 			User returnEntity = userRepository.save(entity);
 			if (returnEntity != null) {
@@ -193,12 +185,6 @@ public class UserServiceImpl implements UserService {
 			result.put("msg", "删除错误.");
 		}
 		return result;
-	}
-
-	@Override
-	public List<User> findAll() {
-		// TODO Auto-generated method stub
-		return userRepository.findAll();
 	}
 
 }

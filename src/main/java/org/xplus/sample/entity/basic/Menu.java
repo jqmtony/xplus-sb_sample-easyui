@@ -64,7 +64,7 @@ public class Menu implements Serializable {
 		this.no = no;
 	}
 
-	@Column(name = "NO")
+	@Column(name = "NAME")
 	public String getName() {
 		return name;
 	}
@@ -82,7 +82,7 @@ public class Menu implements Serializable {
 		this.enName = enName;
 	}
 
-	@Column(name = "NO")
+	@Column(name = "URL")
 	public String getUrl() {
 		return url;
 	}
@@ -91,7 +91,7 @@ public class Menu implements Serializable {
 		this.url = url;
 	}
 
-	@Column(name = "NO")
+	@Column(name = "METHOD")
 	public String getMethod() {
 		return method;
 	}

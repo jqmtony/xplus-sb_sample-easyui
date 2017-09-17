@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  *
  */
 @Controller
-@RequestMapping("/system")
+@RequestMapping("/basic")
 public class MenuController {
 
 }

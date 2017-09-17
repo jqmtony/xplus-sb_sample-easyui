@@ -23,7 +23,7 @@ public class UserType implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	// ......
-	private long id;
+	private Integer id;
 	private String no;
 	private String name;
 	private String enName;
@@ -31,11 +31,11 @@ public class UserType implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", unique = true, nullable = false)
-	public long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -68,7 +68,7 @@ public class UserType implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public UserType(long id, String no, String name, String enName) {
+	public UserType(Integer id, String no, String name, String enName) {
 		super();
 		this.id = id;
 		this.no = no;

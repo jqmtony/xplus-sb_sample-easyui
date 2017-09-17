@@ -20,7 +20,7 @@ import org.xplus.sample.service.basic.RoleService;
  *
  */
 @Controller
-@RequestMapping("/system")
+@RequestMapping("/basic")
 public class RoleController {
 
 	@Autowired

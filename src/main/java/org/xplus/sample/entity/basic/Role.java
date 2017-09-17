@@ -4,7 +4,11 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
 
 /**
  * 角色<br>
@@ -25,6 +29,10 @@ public class Role implements Serializable {
 	private String name;
 	private String enName;
 
+	@Id
+	@GenericGenerator(name = "system-uuid", strategy = "uuid")
+	@GeneratedValue(generator = "system-uuid")
+	@Column(name = "ID", unique = true, nullable = false, length = 32)
 	public String getId() {
 		return id;
 	}
@@ -32,6 +40,7 @@ public class Role implements Serializable {
 	public void setId(String id) {
 		this.id = id;
 	}
+
 	@Column(name = "NO")
 	public String getNo() {
 		return no;
@@ -40,6 +49,7 @@ public class Role implements Serializable {
 	public void setNo(String no) {
 		this.no = no;
 	}
+
 	@Column(name = "NAME")
 	public String getName() {
 		return name;
@@ -56,6 +66,24 @@ public class Role implements Serializable {
 
 	public void setEnName(String enName) {
 		this.enName = enName;
+	}
+
+	public Role() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public Role(String id, String no, String name, String enName) {
+		super();
+		this.id = id;
+		this.no = no;
+		this.name = name;
+		this.enName = enName;
+	}
+
+	@Override
+	public String toString() {
+		return "Role [id=" + id + ", no=" + no + ", name=" + name + ", enName=" + enName + "]";
 	}
 
 }

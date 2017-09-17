@@ -1,4 +1,4 @@
-package org.xplus.sample.vo.system;
+package org.xplus.sample.vo.basic;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -27,15 +27,15 @@ public class UserVO implements Serializable {
 	private String telephone;
 	private String mobile;
 	// ......
-	private String sex;
+	private Integer sex;
 	private String sexNo;
 	private String sexName;
 	// ......
-	private String userType;
+	private Integer userType;
 	private String userTypeNo;
 	private String userTypeName;
 	// ......
-	private String userStatus;
+	private Integer userStatus;
 	private String userStatusNo;
 	private String userStatusName;
 
@@ -121,11 +121,11 @@ public class UserVO implements Serializable {
 		this.mobile = mobile;
 	}
 
-	public String getSex() {
+	public Integer getSex() {
 		return sex;
 	}
 
-	public void setSex(String sex) {
+	public void setSex(Integer sex) {
 		this.sex = sex;
 	}
 
@@ -145,11 +145,11 @@ public class UserVO implements Serializable {
 		this.sexName = sexName;
 	}
 
-	public String getUserType() {
+	public Integer getUserType() {
 		return userType;
 	}
 
-	public void setUserType(String userType) {
+	public void setUserType(Integer userType) {
 		this.userType = userType;
 	}
 
@@ -169,11 +169,11 @@ public class UserVO implements Serializable {
 		this.userTypeName = userTypeName;
 	}
 
-	public String getUserStatus() {
+	public Integer getUserStatus() {
 		return userStatus;
 	}
 
-	public void setUserStatus(String userStatus) {
+	public void setUserStatus(Integer userStatus) {
 		this.userStatus = userStatus;
 	}
 
@@ -210,20 +210,20 @@ public class UserVO implements Serializable {
 		this.email = user.getEmail();
 		this.telephone = user.getTelephone();
 		this.mobile = user.getMobile();
-		this.sex = String.valueOf(user.getSex().getId());
+		this.sex = user.getSex().getId();
 		this.sexNo = user.getSex().getNo();
 		this.sexName = user.getSex().getName();
-		this.userType = String.valueOf(user.getUserType().getId());
+		this.userType = user.getUserType().getId();
 		this.userTypeNo = user.getUserType().getNo();
 		this.userTypeName = user.getUserType().getName();
-		this.userStatus = String.valueOf(user.getUserStatus().getId());
+		this.userStatus = user.getUserStatus().getId();
 		this.userStatusNo = user.getUserStatus().getNo();
 		this.userStatusName = user.getUserStatus().getName();
 	}
 
 	public UserVO(String id, String no, String username, String password, String name, String enName, Date birthday,
-			String email, String telephone, String mobile, String sex, String sexNo, String sexName, String userType,
-			String userTypeNo, String userTypeName, String userStatus, String userStatusNo, String userStatusName) {
+			String email, String telephone, String mobile, Integer sex, String sexNo, String sexName, Integer userType,
+			String userTypeNo, String userTypeName, Integer userStatus, String userStatusNo, String userStatusName) {
 		super();
 		this.id = id;
 		this.no = no;

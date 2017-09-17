@@ -18,7 +18,7 @@ import org.xplus.sample.service.basic.SexService;
 import org.xplus.sample.service.basic.UserService;
 import org.xplus.sample.service.basic.UserStatusService;
 import org.xplus.sample.service.basic.UserTypeService;
-import org.xplus.sample.vo.system.UserVO;
+import org.xplus.sample.vo.basic.UserVO;
 
 /**
  * 用户管理<br>
@@ -27,7 +27,7 @@ import org.xplus.sample.vo.system.UserVO;
  *
  */
 @Controller
-@RequestMapping("/system")
+@RequestMapping("/basic")
 public class UserController {
 
 	@Autowired
@@ -47,7 +47,7 @@ public class UserController {
 		map.put("userTypeList", userTypeService.findAll());
 		map.put("userStatusList", userStatusService.findAll());
 		// ......
-		return new ModelAndView("system/user", map);
+		return new ModelAndView("basic/user", map);
 	}
 
 	@RequestMapping(value = "/userPages", method = RequestMethod.GET)
@@ -56,7 +56,6 @@ public class UserController {
 			@RequestParam(value = "sort", required = false) List<String> sort,
 			@RequestParam(value = "order", required = false) List<String> order,
 			@RequestParam(value = "params", required = false) String params) throws Exception {
-
 		return userService.findAll(page - 1, size, sort, order);
 	}
 
