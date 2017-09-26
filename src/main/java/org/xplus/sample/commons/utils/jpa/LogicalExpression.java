@@ -11,6 +11,11 @@ import javax.persistence.criteria.Root;
 
 import org.springframework.util.StringUtils;
 
+/**
+ * 
+ * @author jqmtony [H]
+ *
+ */
 public class LogicalExpression implements Criterion {
 
 	private Criterion[] criterion; // 逻辑表达式中包含的表达式

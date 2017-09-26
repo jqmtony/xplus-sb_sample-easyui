@@ -7,7 +7,7 @@ import org.xplus.sample.commons.utils.jpa.Criterion.Operator;
 
 /**
  * 条件构造器<br>
- * 用于创建条件表达式
+ * 用于创建条件表达式<br>
  * 
  * @author jqmtony [H]
  *
