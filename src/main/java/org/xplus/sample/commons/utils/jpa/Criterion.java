@@ -5,6 +5,12 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+/**
+ * 条件接口<br>
+ * 
+ * @author jqmtony [H]
+ *
+ */
 public interface Criterion {
 
 	public enum Operator {

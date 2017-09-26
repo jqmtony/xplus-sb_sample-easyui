@@ -7,9 +7,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.criterion.Criterion;
 import org.springframework.data.jpa.domain.Specification;
 
 /**
@@ -30,26 +27,18 @@ public class Criteria<T> implements Specification<T> {
 	// group查询条件
 	private String groupBy;
 
-	@Override
-	public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-		// TODO Auto-generated method stub
-		if (!StringUtils.isEmpty(orderByASC))
-			query.orderBy(cb.desc(root.get(getOrderByASC())));
-		if (!StringUtils.isEmpty(orderByDESC))
-			query.orderBy(cb.desc(root.get(getOrderByDESC())));
-		if (!StringUtils.isEmpty(groupBy))
-			query.groupBy(root.get(getGroupBy()));
+	public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
 		if (!criterions.isEmpty()) {
 			List<Predicate> predicates = new ArrayList<Predicate>();
-			for (Criterion criterion : criterions) {
-				predicates.add(((Specification<T>) criterion).toPredicate(root, query, cb));
+			for (Criterion c : criterions) {
+				predicates.add(c.toPredicate(root, query, builder));
 			}
 			// 将所有条件用 and 联合起来
 			if (predicates.size() > 0) {
-				return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+				return builder.and(predicates.toArray(new Predicate[predicates.size()]));
 			}
 		}
-		return cb.conjunction();
+		return builder.conjunction();
 	}
 
 	/**
