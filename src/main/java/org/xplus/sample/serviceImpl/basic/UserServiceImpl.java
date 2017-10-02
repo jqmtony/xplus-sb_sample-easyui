@@ -23,6 +23,8 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.xplus.sample.commons.pojo.PagedResult;
+import org.xplus.sample.commons.utils.jpa.Criteria;
+import org.xplus.sample.commons.utils.jpa.Restrictions;
 import org.xplus.sample.entity.basic.User;
 import org.xplus.sample.repository.basic.SexRepository;
 import org.xplus.sample.repository.basic.UserRepository;
@@ -101,6 +103,13 @@ public class UserServiceImpl implements UserService {
 			}
 		}, pageable);
 		return page;
+	}
+
+	@Override
+	public User findByUsername(String username) {
+		Criteria<User> criteria = new Criteria<>();
+		criteria.add(Restrictions.eq("username", username));
+		return userRepository.findOne(criteria);
 	}
 
 	public static Sort sortGenerate(List<String> orderFields, List<String> orderTypes) {

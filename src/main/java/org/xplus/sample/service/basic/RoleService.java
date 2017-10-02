@@ -1,5 +1,7 @@
 package org.xplus.sample.service.basic;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.xplus.sample.entity.basic.Role;
 
@@ -11,5 +13,6 @@ import org.xplus.sample.entity.basic.Role;
  */
 public interface RoleService {
 	
-	Page<Role> findAll();
+	Page<Role> findAll(int pageNumber,int pageSize);
+	List<Role> findAll();
 }

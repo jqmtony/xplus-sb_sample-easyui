@@ -1,25 +1,105 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8" />
-<meta http-equiv="X-UA-Compatible" content="edge" />
-<meta name="viewport" content="width=device-width, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title th:text="#{xplus.easyui}"></title>
 <meta name="keywords" content="" />
 <meta name="description" content="" />
 <link type="text/css" th:href="@{/css/base.css}" rel="stylesheet" />
-<link type="text/css" th:href="@{/css/main.css}" rel="stylesheet" />
+<link type="text/css" th:href="@{/css/color.css}" rel="stylesheet" />
+<link type="text/css" th:href="@{/themes/gray/easyui.css}" rel="stylesheet" />
+<script type="text/javascript" th:src="@{/js/jquery-1.8.0.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+<th:block th:switch="${#locale.language}">
+	<script th:case="'zh'" type="text/javascript" th:src="@{/js/locale/easyui-lang-zh_CN.js}"></script>
+	<script th:case="*" type="text/javascript" th:src="@{/js/locale/easyui-lang-en.js}"></script>
+</th:block>
 </head>
-<body>
+<body class="easyui-layout" data-options="fit:true" style="">
+	<div data-options="region:'north',split:false" style="height: 72px;">
+		<div class="easyui-layout" data-options="fit:true">
+			<div data-options="region:'west',border:false,title:'West'" style="width: 100px;">图标</div>
+			<div data-options="region:'center',border:false" style="width: 100px; padding: 5px; background: #efefef;"></div>
+		</div>
+	</div>
+	<div data-options="region:'south',split:false" style="height: 32px; background: #efefef;">
+		<p>
+			<font>XPLUS Sample</font>
+		</p>
+	</div>
+	<div data-options="region:'center',fit:true" style="width: 100px; padding: 5px;">
+		<form id="loginForm" method="post" style="width: 240px; margin: 0px auto; padding-top: 72px;">
+			<div class="lg-username input-item clearfix">
 
+				<label for="username" th:text="#{xplus.login.label.username}">账号</label>
+				<input name="username" type="text" class="easyui-textbox" data-options="required:true"
+					th:placeholder="#{xplus.login.label.username}" />
+			</div>
+			<div class="lg-username input-item clearfix">
+				<label for="password" th:text="#{xplus.login.label.password}">密码</label>
+				<input name="password" type="password" class="easyui-textbox" data-options="required:true"
+					th:placeholder="#{xplus.login.label.password}" />
+			</div>
+			<div class="lg-username input-item clearfix">
+				<a href="javascript:;" class="easyui-linkbutton" style="" onclick="login()">登 录</a>
+			</div>
+
+		</form>
+	</div>
 </body>
 <script type="text/javascript" th:inline="javascript">
 	/*<![CDATA[*/
+
+	//
+	document.onkeydown = function(e) {
+		var ev = document.all ? window.event : e;
+		var obj = ev.target || ev.srcElement;
+		var t = obj.type;
+		if (ev.keyCode == 13) {// 禁用键盘回车事件
+			try {
+				login();
+			} catch (e) {
+				$.message.alert('错误!', e.message, 'error');
+			} finally {
+				$.message.alert('错误!', 'err finally.', 'error');
+			}
+			return false;
+		}
+		if (ev.keyCode == 8 && t != "password" && t != "text"
+				&& t != "textarea") {// 禁用BackSpace事件
+			return false;
+		}
+	};
 
 	$(function() {
 		//......初始化方法
 
 	});
+
+	function login() {
+		debugger;
+		$('#loginForm').form('submit', {
+			url : '/login',
+			onSubmit : function() {
+				return $(this).form('validate');
+			},
+			success : function(data) {
+				debugger;
+				var result = eval('(' + data + ')');
+				if (result.success) {
+					debugger;
+					$.messager.show({
+						title : 'Success',
+						msg : result.message,
+						timeout : 2000
+					});
+				} else {
+					$.messager.error('Error', result.message, function() {
+					});
+				}
+			}
+		});
+	}
 
 	/*]]>*/
 </script>

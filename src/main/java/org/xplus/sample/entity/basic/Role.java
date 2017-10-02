@@ -1,11 +1,18 @@
 package org.xplus.sample.entity.basic;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -28,6 +35,8 @@ public class Role implements Serializable {
 	private String no;
 	private String name;
 	private String enName;
+
+	private Set<Menu> menus = new HashSet<Menu>();
 
 	@Id
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
@@ -66,6 +75,17 @@ public class Role implements Serializable {
 
 	public void setEnName(String enName) {
 		this.enName = enName;
+	}
+
+	@ManyToMany(cascade = { CascadeType.REFRESH, CascadeType.MERGE, CascadeType.PERSIST }, fetch = FetchType.LAZY)
+	@JoinTable(name = "T_SYS_ROLE_MENU_LIST", joinColumns = { @JoinColumn(name = "ROLE_ID") }, inverseJoinColumns = {
+			@JoinColumn(name = "MENU_ID") })
+	public Set<Menu> getMenus() {
+		return menus;
+	}
+
+	public void setMenus(Set<Menu> menus) {
+		this.menus = menus;
 	}
 
 	public Role() {

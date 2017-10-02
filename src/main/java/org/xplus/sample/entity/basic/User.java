@@ -233,6 +233,15 @@ public class User implements Serializable {
 		this.id = id;
 		// TODO Auto-generated constructor stub
 	}
+
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", no=" + no + ", name=" + name + ", enName=" + enName + ", username=" + username
+				+ ", password=" + password + ", sex=" + sex + ", birthday=" + birthday + ", email=" + email
+				+ ", telephone=" + telephone + ", mobile=" + mobile + ", userType=" + userType + ", userStatus="
+				+ userStatus + ", actived=" + actived + ", roles=" + roles + ", depts=" + depts + ", groups=" + groups
+				+ "]";
+	}
 	
 	
 

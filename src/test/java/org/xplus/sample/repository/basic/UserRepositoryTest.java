@@ -1,6 +1,5 @@
 package org.xplus.sample.repository.basic;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
@@ -11,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.xplus.sample.commons.utils.jpa.Criteria;
-import org.xplus.sample.commons.utils.jpa.Criterion;
-import org.xplus.sample.commons.utils.jpa.Projections;
 import org.xplus.sample.commons.utils.jpa.Restrictions;
 import org.xplus.sample.entity.basic.User;
 
@@ -20,7 +17,7 @@ import org.xplus.sample.entity.basic.User;
 @SpringBootTest
 public class UserRepositoryTest {
 
-	private static final Logger log = LoggerFactory.getLogger(UserRepositoryTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(UserRepositoryTest.class);
 
 	/*
 	 * @Before public void setUp() throws Exception { }
@@ -70,8 +67,7 @@ public class UserRepositoryTest {
 
 		if (!userList.isEmpty()) {
 			for (User user : userList) {
-				log.info(user.toString());
-
+				System.out.print(user.toString());
 			}
 		}
 	}

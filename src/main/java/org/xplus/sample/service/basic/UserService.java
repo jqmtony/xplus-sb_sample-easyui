@@ -15,6 +15,8 @@ public interface UserService {
 	//Page<User> findAll(int pageNo, int pageSize, List<String> sort, List<String> order);
 
 	Page<User> findAll(int pageNo, int pageSize, List<String> sort, List<String> order, Map<String, Object> params);
+	
+	User findByUsername(String username);
 
 	Object save(UserVO vo);
 
