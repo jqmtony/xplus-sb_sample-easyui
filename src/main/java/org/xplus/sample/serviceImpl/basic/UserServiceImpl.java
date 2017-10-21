@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.xplus.sample.commons.pojo.PagedResult;
 import org.xplus.sample.commons.utils.jpa.Criteria;
 import org.xplus.sample.commons.utils.jpa.Restrictions;
@@ -34,6 +35,7 @@ import org.xplus.sample.service.basic.UserService;
 import org.xplus.sample.vo.basic.UserVO;
 
 @Service
+@Transactional(noRollbackFor = Exception.class)
 public class UserServiceImpl implements UserService {
 
 	private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
