@@ -1,19 +1,19 @@
 # JDK9新特性
 
->原文地址:http://blog.csdn.net/wangwenjun69/article/details/53572376
+原文地址:http://blog.csdn.net/wangwenjun69/article/details/53572376<br/>
+<br/>
+&emsp;&emsp;Java 8 已经出来三年多的时间了，原本计划2016年七月份release Java 9，但是基于种种原因，Java 9 被推迟到了2017年的3月份，本人也在Open JDK的官网上看到了Java 10的标准也在制定当中，Java的发展真的越来越快了，在Java 9正式发布之前，我们可以使用它的SNAPSHOT版本，先来体验一下Java 9 有哪些新的特性，下面的清单来自于官方文档，看着似乎很多，但是真正具有颠覆意义的其实就是Module System，其余很多主要是一些新的feature增加，还有一些功能的加强，在本篇文章中，我们将介绍一下主要的几个，不会一一去说，资料也不多，所以我想说也没的说，另外Java 8 是我认为迄今为止Java 最大的一次变化，不光是特性的增加，更多的是编程风格的转变，如果你还没有掌握Java 8，建议你看一下本人录制的教学视频，大致40集，专门是针对Java 8特性的实战视频，下载地址为：<br/>
 
->Java 8 已经出来三年多的时间了，原本计划2016年七月份release Java 9，但是基于种种原因，Java 9 被推迟到了2017年的3月份，本人也在Open JDK的官网上看到了Java 10的标准也在制定当中，Java的发展真的越来越快了，在Java 9正式发布之前，我们可以使用它的SNAPSHOT版本，先来体验一下Java 9 有哪些新的特性，下面的清单来自于官方文档，看着似乎很多，但是真正具有颠覆意义的其实就是Module System，其余很多主要是一些新的feature增加，还有一些功能的加强，在本篇文章中，我们将介绍一下主要的几个，不会一一去说，资料也不多，所以我想说也没的说，另外Java 8 是我认为迄今为止Java 最大的一次变化，不光是特性的增加，更多的是编程风格的转变，如果你还没有掌握Java 8，建议你看一下本人录制的教学视频，大致40集，专门是针对Java 8特性的实战视频，下载地址为：
-
-- 102: Process API Updates
-- 110: HTTP 2 Client
-- 143: Improve Contended Locking
-- 158: Unified JVM Logging
-- 165: Compiler Control
-- 193: Variable Handles
-- 197: Segmented Code Cache
-- 199: Smart Java Compilation, Phase Two
-- 200: The Modular JDK
-- 201: Modular Source Code
+- 102: [Process API Updates](http://openjdk.java.net/jeps/102)
+- 110: [HTTP 2 Client](http://openjdk.java.net/jeps/110)
+- 143: [Improve Contended Locking](http://openjdk.java.net/jeps/143)
+- 158: [Unified JVM Logging](http://openjdk.java.net/jeps/143)
+- 165: [Compiler Control](http://openjdk.java.net/jeps/165)
+- 193: [Variable Handles](http://openjdk.java.net/jeps/193)
+- 197: [Segmented Code Cache](http://openjdk.java.net/jeps/197)
+- 199: [Smart Java Compilation, Phase Two](http://openjdk.java.net/jeps/199)
+- 200: [The Modular JDK](http://openjdk.java.net/jeps/200)
+- 201: [Modular Source Code](http://openjdk.java.net/jeps/201)
 - 211: Elide Deprecation Warnings on Import Statements
 - 212: Resolve Lint and Doclint Warnings
 - 213: Milling Project Coin
@@ -93,21 +93,17 @@
 - 295: Ahead-of-Time Compilation
 
 ## 1. Modular System – Jigsaw Project
-> 该特性是Java 9 最大的一个特性，Java 9起初的代号就叫Jigsaw，最近被更改为Modularity，Modularity提供了类似于OSGI框架的功能，模块之间存在相互的依赖关系，可以导出一个公共的API，并且隐藏实现的细节，Java提供该功能的主要的动机在于，减少内存的开销，我们大家都知道，在JVM启动的时候，至少会有30～60MB的内存加载，主要原因是JVM需要加载rt.jar，不管其中的类是否被classloader加载，第一步整个jar都会被JVM加载到内存当中去，模块化可以根据模块的需要加载程序运行需要的class，那么JVM是如何知道需要加载那些class的呢？这就是在Java 9 中引入的一个新的文件module.java我们大致来看一下一个例子（module-info.java）
+&emsp;&emsp;该特性是Java 9 最大的一个特性，Java 9起初的代号就叫Jigsaw，最近被更改为Modularity，Modularity提供了类似于OSGI框架的功能，模块之间存在相互的依赖关系，可以导出一个公共的API，并且隐藏实现的细节，Java提供该功能的主要的动机在于，减少内存的开销，我们大家都知道，在JVM启动的时候，至少会有30～60MB的内存加载，主要原因是JVM需要加载rt.jar，不管其中的类是否被classloader加载，第一步整个jar都会被JVM加载到内存当中去，模块化可以根据模块的需要加载程序运行需要的class，那么JVM是如何知道需要加载那些class的呢？这就是在Java 9 中引入的一个新的文件module.java我们大致来看一下一个例子（module-info.java）<br/>
 
     module com.baeldung.java9.modules.car {  
         requires com.baeldung.java9.modules.engines;  
         exports com.baeldung.java9.modules.car.handling;  
     }  
 
->关于更多Java 9 模块编程的内容请参考一本书：《Java 9 Modularity》 里面讲的比较详细，介绍了当前Java对jar之间以来的管理是多么的混乱，引入modularity之后的改变会是很明显的差别。
+&emsp;&emsp;关于更多Java 9 模块编程的内容请参考一本书：《Java 9 Modularity》 里面讲的比较详细，介绍了当前Java对jar之间以来的管理是多么的混乱，引入modularity之后的改变会是很明显的差别。<br>
 
 ## 2. A New Http Client
-
-   就目前而言，JDK提供的Http访问功能，几乎都需要依赖于HttpURLConnection，但是这个类大家在写代码的时候很少使用，我们一般都会选择Apache的Http Client，此次在Java 9的版本中引入了一个新的package:java.net.http，里面提供了对Http访问很好的支持，不仅支持Http1.1而且还支持HTTP2，以及WebSocket，据说性能可以超过Apache HttpClient，Netty，Jetty，简单的来看一个代码片段
-
-[java] view plain copy
-print?
+&emsp;&emsp;就目前而言，JDK提供的Http访问功能，几乎都需要依赖于HttpURLConnection，但是这个类大家在写代码的时候很少使用，我们一般都会选择Apache的Http Client，此次在Java 9的版本中引入了一个新的package:java.net.http，里面提供了对Http访问很好的支持，不仅支持Http1.1而且还支持HTTP2，以及WebSocket，据说性能可以超过Apache HttpClient，Netty，Jetty，简单的来看一个代码片段<br/>
 
     URI httpURI = new URI("http://www.94jiankang.com");  
     HttpRequest request = HttpRequest.create(httpURI).GET();  
@@ -115,11 +111,7 @@ print?
     String responseBody = response.body(HttpResponse.asString());  
 
 ## 3. Process API Enhance
-
-在Java很早的版本中，提供了Process这样的API可以获得进程的一些信息，包括runtime，甚至是用它来执行当前主机的一些命令，但是请大家思考一个问题，你如何获得你当前Java运行程序的PID？很显然通过Process是无法获得的，需要借助于JMX才能得到，但是在这一次的增强中，你将会很轻松的得到这样的信息，我们来看一个简单的例子
-
-[java] view plain copy
-print?
+&emsp;&emsp;在Java很早的版本中，提供了Process这样的API可以获得进程的一些信息，包括runtime，甚至是用它来执行当前主机的一些命令，但是请大家思考一个问题，你如何获得你当前Java运行程序的PID？很显然通过Process是无法获得的，需要借助于JMX才能得到，但是在这一次的增强中，你将会很轻松的得到这样的信息，我们来看一个简单的例子
 
     ProcessHandle self = ProcessHandle.current();  
     long PID = self.getPid();  
@@ -131,26 +123,20 @@ print?
     Optional<Duration> cpuUsage = procInfo.totalCpuDuration();  
 
 
-上面有大量的Optional，这是Java 8中的API，同样在Java 9中对其进行了增强，本人在Java 8实战视频中对Optional API进行了源码级别的剖析，感兴趣的一定要去看看。
+&emsp;&emsp;上面有大量的Optional，这是Java 8中的API，同样在Java 9中对其进行了增强，本人在Java 8实战视频中对Optional API进行了源码级别的剖析，感兴趣的一定要去看看。<br/>
 
-已经获取到了JVM的进程，我们该如何将该进程优雅的停掉呢？下面的代码给出了答案
-
-[java] view plain copy
-print?
+&emsp;&emsp;已经获取到了JVM的进程，我们该如何将该进程优雅的停掉呢？下面的代码给出了答案<br/>
 
     childProc = ProcessHandle.current().children();  
     childProc.forEach(procHandle -> {  
         assertTrue("Could not kill process " + procHandle.getPid(), procHandle.destroy());  
     });  
 
-通过上面的一小段代码，我们也发现了Java 9对断言机制同样增加了一些增强，多说一些题外话，我们目前的系统中运行一个严重依赖于Hive beelineServer的程序，beeline server不是很稳定，经常出现卡顿，甚至假死，假死后也不回复的问题，这样就导致我们的程序也会出现卡顿，如果运维人员不对其进行清理，系统运行几个月之后会发现很多僵尸进程，于是增加一个获取当前JVM PID的功能，然后判断到超过给定的时间对其进行主动杀死，完全是程序内部的行为，但是获取PID就必须借助于JMX的动作，另外杀死它也必须借助于操作系统的命令，诸如kill这样的命令，显得非常的麻烦，但是Java 9的方式明显要优雅方便许多。
+&emsp;&emsp;通过上面的一小段代码，我们也发现了Java 9对断言机制同样增加了一些增强，多说一些题外话，我们目前的系统中运行一个严重依赖于Hive beelineServer的程序，beeline server不是很稳定，经常出现卡顿，甚至假死，假死后也不回复的问题，这样就导致我们的程序也会出现卡顿，如果运维人员不对其进行清理，系统运行几个月之后会发现很多僵尸进程，于是增加一个获取当前JVM PID的功能，然后判断到超过给定的时间对其进行主动杀死，完全是程序内部的行为，但是获取PID就必须借助于JMX的动作，另外杀死它也必须借助于操作系统的命令，诸如kill这样的命令，显得非常的麻烦，但是Java 9的方式明显要优雅方便许多。
 
 ## 4. Try-With-Resources的改变
 
-   我们都知道，Try-With-Resources是从JDK 7 中引入的一项重要特征，只要接口继承了Closable就可以使用Try-With-Resources，减少finally语句块的编写，在Java 9 中会更加的方便这一特征
-
-[java] view plain copy
-print?
+&emsp;&emsp;我们都知道，Try-With-Resources是从JDK 7 中引入的一项重要特征，只要接口继承了Closable就可以使用Try-With-Resources，减少finally语句块的编写，在Java 9 中会更加的方便这一特征
 
     MyAutoCloseable mac = new MyAutoCloseable();  
     try (mac) {  
@@ -162,12 +148,9 @@ print?
     } catch (Exception ex) { }  
 
 
-我们的Closeable完全不用写在try（）中。
+&emsp;&emsp;我们的Closeable完全不用写在try（）中。
 
 ## 5. Diamond Operator Extension
-
-[java] view plain copy
-print?
 
     FooClass<Integer> fc = new FooClass<>(1) { // anonymous inner class  
     };  
@@ -180,9 +163,6 @@ print?
     };  
 
 ## 6. Interface Private Method
-
-[java] view plain copy
-print?
 
     interface InterfaceWithPrivateMethods {  
            
@@ -204,14 +184,10 @@ print?
     }}  
 
 
-该特性完全是为了Java 8中default方法和static方法服务的。
+&emsp;&emsp;该特性完全是为了Java 8中default方法和static方法服务的。<br/>
 
 ## 7. JShell Command Line Tool
-
-在Java 8 出来的时候，很多人都喊着，这是要抢夺Scala等基于JVM动态语言的市场啊，其中有人给出了一个Java做不到的方向，那就是Scala可以当作脚本语言，Java可以么？很明显在此之前Java不行，ta也不具备动态性，但是此次Java 9 却让Java也可以像脚本语言一样来运行了，主要得益于JShell，我们来看一下这个演示
-
-[java] view plain copy
-print?
+&emsp;&emsp;在Java 8 出来的时候，很多人都喊着，这是要抢夺Scala等基于JVM动态语言的市场啊，其中有人给出了一个Java做不到的方向，那就是Scala可以当作脚本语言，Java可以么？很明显在此之前Java不行，ta也不具备动态性，但是此次Java 9 却让Java也可以像脚本语言一样来运行了，主要得益于JShell，我们来看一下这个演示。<br/>
 
     jdk-9\bin>jshell.exe  
     |  Welcome to JShell -- Version 9  
@@ -219,10 +195,7 @@ print?
     jshell> "This is my long string. I want a part of it".substring(8,19);  
     $5 ==> "my long string"  
 
- 这是我们在Jshell这个控制台下运行，我们如何运行脚本文件呢？
-
-[java] view plain copy
-print?
+&emsp;&emsp;这是我们在Jshell这个控制台下运行，我们如何运行脚本文件呢？<br/>
 
     jshell> /save c:\develop\JShell_hello_world.txt  
     jshell> /open c:\develop\JShell_hello_world.txt  
@@ -230,11 +203,7 @@ print?
 
 
 ## 8.JCMD Sub-Commands
-
-记得在Java 8中，放弃了Jhat这个命令，但是很快在Java 9中增加了一些新的命令，比如我们要介绍到的jcmd,借助它你可以很好的看到类之间的依赖关系
-
-[java] view plain copy
-print?
+&emsp;&emsp;记得在Java 8中，放弃了Jhat这个命令，但是很快在Java 9中增加了一些新的命令，比如我们要介绍到的jcmd,借助它你可以很好的看到类之间的依赖关系<br/>
 
     jdk-9\bin>jcmd 14056 VM.class_hierarchy -i -s java.net.Socket  
     14056:  
@@ -251,11 +220,7 @@ print?
 
 
 ## 9.Мulti-Resolution Image API
-
-接口java.awt.image.MultiResolutionImage封装了一系列的不同分辨率图像到一个单独对象的API，我么可以根据给定的DPI 矩阵获取resolution-specific，看一下下面的代码片段
-
-[java] view plain copy
-print?
+&emsp;&emsp;接口java.awt.image.MultiResolutionImage封装了一系列的不同分辨率图像到一个单独对象的API，我么可以根据给定的DPI 矩阵获取resolution-specific，看一下下面的代码片段。<br/>
 
     BufferedImage[] resolutionVariants = ....  
     MultiResolutionImage bmrImage  
@@ -264,48 +229,32 @@ print?
     assertSame("Images should be the same", testRVImage, resolutionVariants[3]);  
 
 
-关于AWT的东西，本人几乎不怎么接触，如果有用到的朋友，等JDK 9出来之后，自己体会使用一下吧。
+&emsp;&emsp;关于AWT的东西，本人几乎不怎么接触，如果有用到的朋友，等JDK 9出来之后，自己体会使用一下吧。<br/>
 
 
 ## 10. Variable Handles
-
-很早之前就传言Java 会将unsafe这一个类屏蔽掉，不给大家使用，这次看他的官方文档，貌似所有已sun开头的包都将不能在application中使用，但是java 9 提供了新的API供大家使用。
-
-在JDK 9中提供了一个新的包，叫做java.lang.invoke里面有一系列很重要的类比如VarHandler和MethodHandles，提供了类似于原子操作以及Unsafe操作的功能。
+&emsp;&emsp;很早之前就传言Java 会将unsafe这一个类屏蔽掉，不给大家使用，这次看他的官方文档，貌似所有已sun开头的包都将不能在application中使用，但是java 9 提供了新的API供大家使用。<br/>
+&emsp;&emsp;在JDK 9中提供了一个新的包，叫做java.lang.invoke里面有一系列很重要的类比如VarHandler和MethodHandles，提供了类似于原子操作以及Unsafe操作的功能。<br/>
 
 
 ## 11.Publish-Subscribe Framework
-
->在新版的JDK 9 中提供了消息发布订阅的框架，该框架主要是由Flow这个类提供的，他同样会在java.util.concurrent中出现，并且提供了Reactive编程模式。
+&emsp;&emsp;在新版的JDK 9 中提供了消息发布订阅的框架，该框架主要是由Flow这个类提供的，他同样会在java.util.concurrent中出现，并且提供了Reactive编程模式。<br/>
 
 ## 12. Unified JVM Logging
-
-该特性为JVM的所有组件引入了一个通用的日志系统，提供了JVM日志的基础设施，你可以不用专门为了打印某些日志而添加一些专门的标签，只需要使用统一的log指令即可，比如：
-
-[java] view plain copy
-print?
+&emsp;&emsp;该特性为JVM的所有组件引入了一个通用的日志系统，提供了JVM日志的基础设施，你可以不用专门为了打印某些日志而添加一些专门的标签，只需要使用统一的log指令即可，比如：<br/>
 
     java -Xlog:gc=debug:file=gc.txt:none ...  
     jcmd 9615 VM.log output=gc_logs what=gc  
 
 
 ## 13. Immutable Set
-
-其实在Java的早期版本中就已经有这样的功能了，比如Collections.xxx就可以将某个collection封装成不可变，但是此次的Java 9版本将其加到了对应的Set和List中，并且有一个专门的新包用来存放这些具体的实现java.util.ImmutableCollections，这一个特性和Scala真的如出一辙。
-
-[java] view plain copy
-print?
+&emsp;&emsp;其实在Java的早期版本中就已经有这样的功能了，比如Collections.xxx就可以将某个collection封装成不可变，但是此次的Java 9版本将其加到了对应的Set和List中，并且有一个专门的新包用来存放这些具体的实现java.util.ImmutableCollections，这一个特性和Scala真的如出一辙。<br/>
 
     Set<String> strKeySet = Set.of("key1", "key2", "key3");  
 
 
 ## 14.  Optional To Stream
-
-对Option提供了stream功能，关于Optional的用法，我在我的教程中讲的非常详细，如果你还没有掌握，抓紧啊
-
-
-[java] view plain copy
-print?
+&emsp;&emsp;对Option提供了stream功能，关于Optional的用法，我在我的教程中讲的非常详细，如果你还没有掌握，抓紧啊<br/>
 
     List<String> filteredList = listOfOptionals.stream()  
       .flatMap(Optional::stream)  
@@ -313,18 +262,20 @@ print?
 
 
 ## 15. 其他
+1.	大致的特性我就介绍这么多，你也可以到openJDK官网下载snapshot版本的java 9 来玩一下，当然还有其他很多功能我就不一一介绍了，这里只是大概的提一下
+2.	轻量级的json文本处理api
+3.	移除很多已经被过期的GCC回收器（是移除哦，因为在Jdk 8 中只是加了过期的标记）
+4.	使用G1垃圾回收器作为默认的垃圾回收器
+5.	HTML5风格的java doc
+6.	java doc只是智能搜索功能
+7.	javascript的引擎得到了进一步的升级
+8.	引入了SHA-3的hash算法
+9.	大神Doug Lea继续为了这个版本的JDK服务，并且还会惊艳到大家。
 
-<ol>
-<li>大致的特性我就介绍这么多，你也可以到openJDK官网下载snapshot版本的java 9 来玩一下，当然还有其他很多功能我就不一一介绍了，这里只是大概的提一下</li>
-<li>轻量级的json文本处理api</li>
-<li>移除很多已经被过期的GCC回收器（是移除哦，因为在Jdk 8 中只是加了过期的标记）</li>
-<li>使用G1垃圾回收器作为默认的垃圾回收器</li>
-<li>HTML5风格的java doc</li>
-<li>java doc只是智能搜索功能</li>
-<li>javascript的引擎得到了进一步的升级</li>
-<li>引入了SHA-3的hash算法</li>
-<li>大神Doug Lea继续为了这个版本的JDK服务，并且还会惊艳到大家。</li>
-<ol>
+# 参考资料
+
+- http://www.oracle.com/technetwork/indexes/downloads/index.html
+- http://docs.oracle.com/en/java/
 
 
 
